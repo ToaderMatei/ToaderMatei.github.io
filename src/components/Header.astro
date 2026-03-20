@@ -5,7 +5,10 @@ import { SITE_TITLE } from '../consts';
 
 <header>
 	<nav>
-		<a href="/" class="site-title">{SITE_TITLE}</a>
+		<a href="/" class="site-title">
+			<img src="/logo.png" alt="m68k logo" class="logo" />
+			{SITE_TITLE}
+		</a>
 		<div class="nav-links">
 			<HeaderLink href="/blog">Write-ups</HeaderLink>
 			<HeaderLink href="/projects">Projects</HeaderLink>
@@ -91,6 +94,15 @@ import { SITE_TITLE } from '../consts';
 		color: var(--text);
 		text-decoration: none;
 		white-space: nowrap;
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+	}
+
+	.logo {
+		width: 24px;
+		height: 24px;
+		object-fit: contain;
 	}
 
 	.site-title:hover {
