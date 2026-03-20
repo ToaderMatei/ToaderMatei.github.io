@@ -5,9 +5,8 @@ import { SITE_TITLE } from '../consts';
 
 <header>
 	<nav>
-		<a href="/" class="site-title">
-			<img src="/logo.png" alt="m68k logo" class="logo" />
-			{SITE_TITLE}
+		<a href="/" class="logo-btn" aria-label="Home">
+			<img src="/logo.png" alt="m68k" class="logo" />
 		</a>
 		<div class="nav-links">
 			<HeaderLink href="/blog">Write-ups</HeaderLink>
@@ -85,23 +84,23 @@ import { SITE_TITLE } from '../consts';
 		max-width: 760px;
 		margin: 0 auto;
 		padding: 0 1em;
-		height: 72px;
+		height: 88px;
 	}
 
-	.site-title {
-		font-weight: 700;
-		font-size: 1em;
-		color: var(--text);
-		text-decoration: none;
-		white-space: nowrap;
+	.logo-btn {
 		display: flex;
 		align-items: center;
-		gap: 0.5em;
+		text-decoration: none;
+		flex-shrink: 0;
+	}
+
+	.logo-btn:hover {
+		opacity: 0.85;
 	}
 
 	.logo {
-		width: 64px;
-		height: 64px;
+		width: 80px;
+		height: 80px;
 		object-fit: contain;
 	}
 
