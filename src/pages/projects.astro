@@ -1,0 +1,120 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_TITLE } from '../consts';
+
+const projects = [
+	// Add your projects here:
+	// {
+	//   name: "Project Name",
+	//   description: "Short description.",
+	//   url: "https://github.com/ToaderMatei/project",
+	//   tags: ["python", "security"],
+	// },
+];
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`Projects | ${SITE_TITLE}`} description="Projects by m68k." />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<h1>Projects</h1>
+			{projects.length === 0 ? (
+				<p class="empty">Coming soon.</p>
+			) : (
+				<ul>
+					{projects.map((project: { name: string; description: string; url?: string; tags?: string[] }) => (
+						<li>
+							<div class="project-header">
+								{project.url ? (
+									<a href={project.url} target="_blank" class="project-name">{project.name}</a>
+								) : (
+									<span class="project-name">{project.name}</span>
+								)}
+								{project.tags && (
+									<div class="tags">
+										{project.tags.map((tag: string) => <span class="tag">{tag}</span>)}
+									</div>
+								)}
+							</div>
+							<p class="description">{project.description}</p>
+						</li>
+					))}
+				</ul>
+			)}
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	h1 {
+		font-size: 1.5em;
+		margin-bottom: 1.5em;
+	}
+
+	ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0;
+	}
+
+	li {
+		padding: 1em 0;
+		border-bottom: 1px solid var(--border);
+	}
+
+	li:last-child {
+		border-bottom: none;
+	}
+
+	.project-header {
+		display: flex;
+		align-items: center;
+		gap: 0.75em;
+		margin-bottom: 0.35em;
+	}
+
+	.project-name {
+		color: var(--text);
+		font-weight: 500;
+		font-size: 0.95em;
+	}
+
+	a.project-name:hover {
+		color: var(--accent);
+		text-decoration: none;
+	}
+
+	.description {
+		color: var(--text-muted);
+		font-size: 0.9em;
+		margin: 0;
+	}
+
+	.tags {
+		display: flex;
+		gap: 0.4em;
+	}
+
+	.tag {
+		font-size: 0.75em;
+		padding: 2px 8px;
+		border-radius: 12px;
+		background-color: var(--bg-secondary);
+		border: 1px solid var(--border);
+		color: var(--text-muted);
+	}
+
+	.empty {
+		color: var(--text-muted);
+	}
+</style>

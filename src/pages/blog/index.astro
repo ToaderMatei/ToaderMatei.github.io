@@ -1,0 +1,86 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import Header from '../../components/Header.astro';
+import { SITE_TITLE } from '../../consts';
+
+const posts = (await getCollection('blog')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`Write-ups | ${SITE_TITLE}`} description="CTF write-ups and security research." />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<h1>Write-ups</h1>
+			{posts.length === 0 ? (
+				<p class="empty">No posts yet.</p>
+			) : (
+				<ul>
+					{posts.map((post) => (
+						<li>
+							<a href={`/blog/${post.id}/`}>{post.data.title}</a>
+							<span class="date"><FormattedDate date={post.data.pubDate} /></span>
+						</li>
+					))}
+				</ul>
+			)}
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	h1 {
+		font-size: 1.5em;
+		margin-bottom: 1.5em;
+	}
+
+	ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+	}
+
+	li {
+		display: flex;
+		justify-content: space-between;
+		align-items: baseline;
+		gap: 1em;
+		padding: 0.75em 0;
+		border-bottom: 1px solid var(--border);
+	}
+
+	li:last-child {
+		border-bottom: none;
+	}
+
+	li a {
+		color: var(--text);
+		font-size: 0.95em;
+	}
+
+	li a:hover {
+		color: var(--accent);
+		text-decoration: none;
+	}
+
+	.date {
+		color: var(--text-muted);
+		font-size: 0.85em;
+		white-space: nowrap;
+	}
+
+	.empty {
+		color: var(--text-muted);
+	}
+</style>

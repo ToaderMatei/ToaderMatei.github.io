@@ -1,0 +1,151 @@
+:root {
+	--bg: #ffffff;
+	--bg-secondary: #f6f8fa;
+	--text: #24292f;
+	--text-muted: #656d76;
+	--accent: #0969da;
+	--border: #d0d7de;
+	--code-bg: #f6f8fa;
+	--pre-bg: #161b22;
+	--pre-text: #c9d1d9;
+}
+
+[data-theme="dark"] {
+	--bg: #0d1117;
+	--bg-secondary: #161b22;
+	--text: #c9d1d9;
+	--text-muted: #8b949e;
+	--accent: #58a6ff;
+	--border: #30363d;
+	--code-bg: #161b22;
+	--pre-bg: #161b22;
+	--pre-text: #c9d1d9;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+	margin: 0;
+	padding: 0;
+	background-color: var(--bg);
+	color: var(--text);
+	font-size: 16px;
+	line-height: 1.7;
+	transition: background-color 0.2s, color 0.2s;
+}
+
+main {
+	width: 720px;
+	max-width: calc(100% - 2em);
+	margin: 0 auto;
+	padding: 2em 1em 4em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	margin: 0 0 0.5rem 0;
+	color: var(--text);
+	line-height: 1.3;
+	font-weight: 600;
+}
+
+h1 { font-size: 2em; }
+h2 { font-size: 1.5em; }
+h3 { font-size: 1.25em; }
+h4 { font-size: 1em; }
+
+a {
+	color: var(--accent);
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+p {
+	margin: 0 0 1em 0;
+}
+
+.prose p {
+	margin-bottom: 1.5em;
+}
+
+code {
+	font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+	font-size: 0.875em;
+	padding: 2px 6px;
+	background-color: var(--code-bg);
+	border: 1px solid var(--border);
+	border-radius: 4px;
+}
+
+pre {
+	background-color: var(--pre-bg);
+	color: var(--pre-text);
+	padding: 1.2em 1.5em;
+	border-radius: 6px;
+	overflow-x: auto;
+	margin: 1.5em 0;
+}
+
+pre > code {
+	all: unset;
+	font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+	font-size: 0.875em;
+}
+
+blockquote {
+	border-left: 3px solid var(--accent);
+	padding: 0 0 0 1em;
+	margin: 1em 0;
+	color: var(--text-muted);
+}
+
+hr {
+	border: none;
+	border-top: 1px solid var(--border);
+	margin: 2em 0;
+}
+
+img {
+	max-width: 100%;
+	height: auto;
+	border-radius: 6px;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+th, td {
+	padding: 0.5em 0.75em;
+	border: 1px solid var(--border);
+	text-align: left;
+}
+
+th {
+	background-color: var(--bg-secondary);
+	font-weight: 600;
+}
+
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+@media (max-width: 720px) {
+	body {
+		font-size: 15px;
+	}
+}

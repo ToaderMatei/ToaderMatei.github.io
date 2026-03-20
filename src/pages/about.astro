@@ -1,0 +1,68 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_TITLE } from '../consts';
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`About | ${SITE_TITLE}`} description="About m68k." />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<h1>About</h1>
+			<div class="content">
+				<p>
+					Hi, I'm <strong>m68k</strong> — a student interested in computer security,
+					CTF competitions, and low-level programming.
+				</p>
+				<p>
+					I use this site to post write-ups from CTF challenges I solve and share projects
+					I'm working on.
+				</p>
+				<h2>Contact</h2>
+				<ul>
+					<li>GitHub: <a href="https://github.com/ToaderMatei" target="_blank">ToaderMatei</a></li>
+					<li>Discord: <strong>m68k</strong></li>
+				</ul>
+			</div>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	h1 {
+		font-size: 1.5em;
+		margin-bottom: 1.5em;
+	}
+
+	h2 {
+		font-size: 1.1em;
+		margin: 1.5em 0 0.75em;
+	}
+
+	.content {
+		max-width: 600px;
+	}
+
+	.content p {
+		color: var(--text);
+	}
+
+	ul {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.4em;
+	}
+
+	li {
+		font-size: 0.95em;
+	}
+</style>

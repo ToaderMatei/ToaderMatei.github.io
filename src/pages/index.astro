@@ -1,0 +1,130 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import Header from '../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+
+const posts = (await getCollection('blog'))
+	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+	.slice(0, 5);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<div class="intro">
+				<h1>m68k</h1>
+				<p>Student. Interested in security, CTF challenges, and low-level stuff.</p>
+				<div class="links">
+					<a href="https://github.com/ToaderMatei" target="_blank">GitHub</a>
+					<span class="sep">/</span>
+					<span>Discord: m68k</span>
+				</div>
+			</div>
+
+			{posts.length > 0 && (
+				<section>
+					<h2>Recent Write-ups</h2>
+					<ul>
+						{posts.map((post) => (
+							<li>
+								<a href={`/blog/${post.id}/`}>{post.data.title}</a>
+								<span class="date"><FormattedDate date={post.data.pubDate} /></span>
+							</li>
+						))}
+					</ul>
+					<a href="/blog" class="view-all">All write-ups &rarr;</a>
+				</section>
+			)}
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.intro {
+		padding: 2em 0 3em;
+		border-bottom: 1px solid var(--border);
+		margin-bottom: 2.5em;
+	}
+
+	.intro h1 {
+		font-size: 2em;
+		margin-bottom: 0.4em;
+	}
+
+	.intro p {
+		color: var(--text-muted);
+		margin-bottom: 1em;
+		font-size: 1em;
+	}
+
+	.links {
+		display: flex;
+		gap: 0.5em;
+		align-items: center;
+		font-size: 0.9em;
+		color: var(--text-muted);
+	}
+
+	.links a {
+		color: var(--accent);
+	}
+
+	.sep {
+		color: var(--border);
+	}
+
+	section h2 {
+		font-size: 0.85em;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: var(--text-muted);
+		margin-bottom: 1em;
+	}
+
+	ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.75em;
+	}
+
+	li {
+		display: flex;
+		justify-content: space-between;
+		align-items: baseline;
+		gap: 1em;
+	}
+
+	li a {
+		color: var(--text);
+		font-size: 0.95em;
+	}
+
+	li a:hover {
+		color: var(--accent);
+	}
+
+	.date {
+		color: var(--text-muted);
+		font-size: 0.85em;
+		white-space: nowrap;
+	}
+
+	.view-all {
+		display: inline-block;
+		margin-top: 1.5em;
+		font-size: 0.9em;
+		color: var(--accent);
+	}
+</style>
