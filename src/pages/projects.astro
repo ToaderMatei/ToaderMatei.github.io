@@ -9,7 +9,15 @@ const projects = [
 		name: "Sentinel Web Scanner",
 		description: "A Python-based web vulnerability scanner with FastAPI, SQLite, and HTML reporting.",
 		url: "https://github.com/ToaderMatei/web-vulnerability-scanner",
+		image: "/projects/sentinel-dashboard.png",
 		tags: ["python", "fastapi", "security"],
+	},
+	{
+		name: "CyberLens",
+		description: "Advanced cybersecurity log analyzer with threat detection, anomaly analysis, and rich reporting.",
+		url: "https://github.com/ToaderMatei/CyberLens",
+		image: "/projects/cyberlens-dashboard.png",
+		tags: ["python", "security", "cli"],
 	},
 ];
 ---
@@ -27,21 +35,26 @@ const projects = [
 				<p class="empty">Coming soon.</p>
 			) : (
 				<ul>
-					{projects.map((project: { name: string; description: string; url?: string; tags?: string[] }) => (
+					{projects.map((project) => (
 						<li>
-							<div class="project-header">
-								{project.url ? (
-									<a href={project.url} target="_blank" class="project-name">{project.name}</a>
-								) : (
-									<span class="project-name">{project.name}</span>
-								)}
-								{project.tags && (
-									<div class="tags">
-										{project.tags.map((tag: string) => <span class="tag">{tag}</span>)}
+							<a href={project.url} target="_blank" class="card">
+								{project.image && (
+									<div class="card-image">
+										<img src={project.image} alt={project.name} />
 									</div>
 								)}
-							</div>
-							<p class="description">{project.description}</p>
+								<div class="card-body">
+									<div class="card-header">
+										<span class="project-name">{project.name}</span>
+										<div class="tags">
+											{project.tags.map((tag: string) => (
+												<span class="tag">{tag}</span>
+											))}
+										</div>
+									</div>
+									<p class="description">{project.description}</p>
+								</div>
+							</a>
 						</li>
 					))}
 				</ul>
@@ -63,39 +76,60 @@ const projects = [
 		padding: 0;
 		display: flex;
 		flex-direction: column;
-		gap: 0;
+		gap: 1.25em;
 	}
 
-	li {
-		padding: 1em 0;
+	.card {
+		display: block;
+		border: 1px solid var(--border);
+		border-radius: 8px;
+		overflow: hidden;
+		text-decoration: none;
+		background-color: var(--bg-secondary);
+		transition: border-color 0.15s, box-shadow 0.15s;
+	}
+
+	.card:hover {
+		border-color: var(--accent);
+		box-shadow: 0 0 0 1px var(--accent);
+		text-decoration: none;
+	}
+
+	.card-image {
+		width: 100%;
+		height: 200px;
+		overflow: hidden;
 		border-bottom: 1px solid var(--border);
 	}
 
-	li:last-child {
-		border-bottom: none;
+	.card-image img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: top;
+		border-radius: 0;
 	}
 
-	.project-header {
+	.card-body {
+		padding: 1em 1.25em;
+	}
+
+	.card-header {
 		display: flex;
 		align-items: center;
 		gap: 0.75em;
-		margin-bottom: 0.35em;
+		margin-bottom: 0.4em;
 	}
 
 	.project-name {
 		color: var(--text);
-		font-weight: 500;
+		font-weight: 600;
 		font-size: 0.95em;
-	}
-
-	a.project-name:hover {
-		color: var(--accent);
-		text-decoration: none;
 	}
 
 	.description {
 		color: var(--text-muted);
-		font-size: 0.9em;
+		font-size: 0.875em;
 		margin: 0;
 	}
 
@@ -105,12 +139,13 @@ const projects = [
 	}
 
 	.tag {
-		font-size: 0.75em;
+		font-size: 0.7em;
 		padding: 2px 8px;
 		border-radius: 12px;
-		background-color: var(--bg-secondary);
+		background-color: var(--bg);
 		border: 1px solid var(--border);
 		color: var(--text-muted);
+		white-space: nowrap;
 	}
 
 	.empty {
