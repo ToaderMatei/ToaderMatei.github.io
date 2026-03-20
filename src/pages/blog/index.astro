@@ -26,7 +26,16 @@ const posts = (await getCollection('blog')).sort(
 				<ul>
 					{posts.map((post) => (
 						<li>
-							<a href={`/blog/${post.id}/`}>{post.data.title}</a>
+							<div class="post-info">
+								<a href={`/blog/${post.id}/`} class="post-title">{post.data.title}</a>
+								{post.data.tags && post.data.tags.length > 0 && (
+									<div class="tags">
+										{post.data.tags.slice(0, 3).map((tag: string) => (
+											<span class="tag">{tag}</span>
+										))}
+									</div>
+								)}
+							</div>
 							<span class="date"><FormattedDate date={post.data.pubDate} /></span>
 						</li>
 					))}
@@ -54,7 +63,7 @@ const posts = (await getCollection('blog')).sort(
 	li {
 		display: flex;
 		justify-content: space-between;
-		align-items: baseline;
+		align-items: center;
 		gap: 1em;
 		padding: 0.75em 0;
 		border-bottom: 1px solid var(--border);
@@ -64,23 +73,51 @@ const posts = (await getCollection('blog')).sort(
 		border-bottom: none;
 	}
 
-	li a {
-		color: var(--text);
-		font-size: 0.95em;
+	.post-info {
+		display: flex;
+		align-items: center;
+		gap: 0.75em;
+		min-width: 0;
 	}
 
-	li a:hover {
+	.post-title {
+		color: var(--text);
+		font-size: 0.9em;
+	}
+
+	.post-title:hover {
 		color: var(--accent);
 		text-decoration: none;
 	}
 
+	.tags {
+		display: flex;
+		gap: 0.3em;
+		flex-shrink: 0;
+	}
+
+	.tag {
+		font-size: 0.7em;
+		padding: 2px 7px;
+		border-radius: 10px;
+		background-color: var(--bg-secondary);
+		border: 1px solid var(--border);
+		color: var(--text-muted);
+		white-space: nowrap;
+	}
+
 	.date {
 		color: var(--text-muted);
-		font-size: 0.85em;
+		font-size: 0.8em;
 		white-space: nowrap;
+		flex-shrink: 0;
 	}
 
 	.empty {
 		color: var(--text-muted);
+	}
+
+	@media (max-width: 560px) {
+		.tags { display: none; }
 	}
 </style>

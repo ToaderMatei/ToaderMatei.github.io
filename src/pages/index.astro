@@ -8,7 +8,7 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 
 const posts = (await getCollection('blog'))
 	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
-	.slice(0, 5);
+	.slice(0, 8);
 ---
 
 <!doctype html>
@@ -20,12 +20,23 @@ const posts = (await getCollection('blog'))
 		<Header />
 		<main>
 			<div class="intro">
-				<h1>m68k</h1>
-				<p>Student. Interested in security, CTF challenges, and low-level stuff.</p>
-				<div class="links">
-					<a href="https://github.com/ToaderMatei" target="_blank">GitHub</a>
-					<span class="sep">/</span>
-					<span>Discord: m68k.</span>
+				<div class="intro-text">
+					<h1>Hey, I'm m68k.</h1>
+					<p>
+						I'm a student who spends most of my free time playing CTFs and poking at things
+						that probably shouldn't be poked. This is where I write about what I find.
+					</p>
+					<div class="links">
+						<a href="https://github.com/ToaderMatei" target="_blank">
+							<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+							GitHub
+						</a>
+						<span class="sep">&middot;</span>
+						<span class="discord">
+							<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M13.545 2.907a13.227 13.227 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.19 12.19 0 0 0-3.658 0 8.258 8.258 0 0 0-.412-.833.051.051 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.041.041 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032c.001.014.01.028.021.037a13.276 13.276 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019c.308-.42.582-.863.818-1.329a.05.05 0 0 0-.01-.059.051.051 0 0 0-.018-.011 8.875 8.875 0 0 1-1.248-.595.05.05 0 0 1-.02-.066.051.051 0 0 1 .015-.019c.084-.063.168-.129.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.052.052 0 0 1 .053.007c.08.066.164.132.248.195a.051.051 0 0 1-.004.085 8.254 8.254 0 0 1-1.249.594.05.05 0 0 0-.03.03.052.052 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.235 13.235 0 0 0 4.001-2.02.049.049 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.034.034 0 0 0-.02-.019Zm-8.198 7.307c-.789 0-1.438-.724-1.438-1.612 0-.889.637-1.613 1.438-1.613.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612Zm5.316 0c-.788 0-1.438-.724-1.438-1.612 0-.889.637-1.613 1.438-1.613.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612Z"/></svg>
+							m68k.
+						</span>
+					</div>
 				</div>
 			</div>
 
@@ -35,7 +46,16 @@ const posts = (await getCollection('blog'))
 					<ul>
 						{posts.map((post) => (
 							<li>
-								<a href={`/blog/${post.id}/`}>{post.data.title}</a>
+								<div class="post-info">
+									<a href={`/blog/${post.id}/`} class="post-title">{post.data.title}</a>
+									{post.data.tags && post.data.tags.length > 0 && (
+										<div class="tags">
+											{post.data.tags.slice(0, 3).map((tag: string) => (
+												<span class="tag">{tag}</span>
+											))}
+										</div>
+									)}
+								</div>
 								<span class="date"><FormattedDate date={post.data.pubDate} /></span>
 							</li>
 						))}
@@ -50,32 +70,49 @@ const posts = (await getCollection('blog'))
 
 <style>
 	.intro {
-		padding: 2em 0 3em;
+		padding: 3em 0 3em;
 		border-bottom: 1px solid var(--border);
 		margin-bottom: 2.5em;
 	}
 
 	.intro h1 {
-		font-size: 2em;
-		margin-bottom: 0.4em;
+		font-size: 1.75em;
+		margin-bottom: 0.6em;
+		font-weight: 700;
 	}
 
 	.intro p {
 		color: var(--text-muted);
-		margin-bottom: 1em;
-		font-size: 1em;
+		margin-bottom: 1.25em;
+		font-size: 0.95em;
+		max-width: 520px;
+		line-height: 1.8;
 	}
 
 	.links {
 		display: flex;
-		gap: 0.5em;
+		gap: 0.6em;
 		align-items: center;
-		font-size: 0.9em;
+		font-size: 0.875em;
 		color: var(--text-muted);
 	}
 
 	.links a {
+		color: var(--text-muted);
+		display: flex;
+		align-items: center;
+		gap: 0.35em;
+	}
+
+	.links a:hover {
 		color: var(--accent);
+		text-decoration: none;
+	}
+
+	.discord {
+		display: flex;
+		align-items: center;
+		gap: 0.35em;
 	}
 
 	.sep {
@@ -83,11 +120,12 @@ const posts = (await getCollection('blog'))
 	}
 
 	section h2 {
-		font-size: 0.85em;
+		font-size: 0.8em;
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
+		letter-spacing: 0.08em;
 		color: var(--text-muted);
-		margin-bottom: 1em;
+		margin-bottom: 1.25em;
+		font-weight: 600;
 	}
 
 	ul {
@@ -96,35 +134,74 @@ const posts = (await getCollection('blog'))
 		padding: 0;
 		display: flex;
 		flex-direction: column;
-		gap: 0.75em;
 	}
 
 	li {
 		display: flex;
 		justify-content: space-between;
-		align-items: baseline;
+		align-items: center;
 		gap: 1em;
+		padding: 0.75em 0;
+		border-bottom: 1px solid var(--border);
 	}
 
-	li a {
+	li:last-child {
+		border-bottom: none;
+	}
+
+	.post-info {
+		display: flex;
+		align-items: center;
+		gap: 0.75em;
+		min-width: 0;
+	}
+
+	.post-title {
 		color: var(--text);
-		font-size: 0.95em;
+		font-size: 0.9em;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
-	li a:hover {
+	.post-title:hover {
 		color: var(--accent);
+		text-decoration: none;
+	}
+
+	.tags {
+		display: flex;
+		gap: 0.3em;
+		flex-shrink: 0;
+	}
+
+	.tag {
+		font-size: 0.7em;
+		padding: 2px 7px;
+		border-radius: 10px;
+		background-color: var(--bg-secondary);
+		border: 1px solid var(--border);
+		color: var(--text-muted);
+		white-space: nowrap;
 	}
 
 	.date {
 		color: var(--text-muted);
-		font-size: 0.85em;
+		font-size: 0.8em;
 		white-space: nowrap;
+		flex-shrink: 0;
 	}
 
 	.view-all {
 		display: inline-block;
 		margin-top: 1.5em;
-		font-size: 0.9em;
+		font-size: 0.875em;
 		color: var(--accent);
+	}
+
+	@media (max-width: 560px) {
+		.tags {
+			display: none;
+		}
 	}
 </style>

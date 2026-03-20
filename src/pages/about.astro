@@ -16,17 +16,30 @@ import { SITE_TITLE } from '../consts';
 			<h1>About</h1>
 			<div class="content">
 				<p>
-					Hi, I'm <strong>m68k</strong> — a student interested in computer security,
-					CTF competitions, and low-level programming.
+					Hey — I'm <strong>m68k</strong>, a student from Romania. I spend most of my free time
+					playing CTF competitions and reading about security topics that probably have
+					no practical use outside of CTFs.
 				</p>
 				<p>
-					I use this site to post write-ups from CTF challenges I solve and share projects
-					I'm working on.
+					I started this site to keep track of the challenges I solve and to force myself
+					to actually document my thought process instead of just moving on to the next one.
+					If something here is useful to you, great. If not, at least I learned something writing it.
 				</p>
+				<p>
+					I'm mostly interested in web exploitation, network forensics, and reverse engineering —
+					though I'll try anything in a CTF.
+				</p>
+
 				<h2>Contact</h2>
 				<ul>
-					<li>GitHub: <a href="https://github.com/ToaderMatei" target="_blank">ToaderMatei</a></li>
-					<li>Discord: <strong>m68k.</strong></li>
+					<li>
+						<span class="label">GitHub</span>
+						<a href="https://github.com/ToaderMatei" target="_blank">ToaderMatei</a>
+					</li>
+					<li>
+						<span class="label">Discord</span>
+						<span>m68k.</span>
+					</li>
 				</ul>
 			</div>
 		</main>
@@ -41,15 +54,26 @@ import { SITE_TITLE } from '../consts';
 	}
 
 	h2 {
-		font-size: 1.1em;
-		margin: 1.5em 0 0.75em;
+		font-size: 0.8em;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		color: var(--text-muted);
+		margin: 2em 0 1em;
+		font-weight: 600;
 	}
 
 	.content {
-		max-width: 600px;
+		max-width: 580px;
 	}
 
 	.content p {
+		color: var(--text-muted);
+		font-size: 0.95em;
+		line-height: 1.8;
+		margin-bottom: 1.1em;
+	}
+
+	.content p strong {
 		color: var(--text);
 	}
 
@@ -59,10 +83,19 @@ import { SITE_TITLE } from '../consts';
 		margin: 0;
 		display: flex;
 		flex-direction: column;
-		gap: 0.4em;
+		gap: 0.6em;
 	}
 
 	li {
-		font-size: 0.95em;
+		display: flex;
+		gap: 1.5em;
+		font-size: 0.9em;
+		align-items: baseline;
+	}
+
+	.label {
+		color: var(--text-muted);
+		min-width: 60px;
+		font-size: 0.85em;
 	}
 </style>
