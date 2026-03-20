@@ -6,6 +6,6 @@ import { defineConfig } from 'astro/config';
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://toadermatei.github.io',
+	site: 'https://m68k.ro',
 	integrations: [mdx(), sitemap()],
 });
