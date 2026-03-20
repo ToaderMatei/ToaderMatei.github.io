@@ -1,0 +1,143 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import { SITE_TITLE } from '../../consts';
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`Forensics Cheat Sheet | ${SITE_TITLE}`} description="CTF forensics quick reference." />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<div class="breadcrumb"><a href="/posts">Posts</a> / Cheat Sheets / Forensics</div>
+			<h1>Forensics Cheat Sheet</h1>
+
+			<section>
+				<h2>File Identification</h2>
+				<pre><code>file suspicious.bin
+xxd suspicious.bin | head -20
+binwalk suspicious.bin          # embedded files
+strings suspicious.bin | less
+exiftool image.jpg              # metadata</code></pre>
+			</section>
+
+			<section>
+				<h2>Disk / Image</h2>
+				<pre><code># Mount raw image
+sudo mount -o loop,ro disk.img /mnt/disk
+
+# FTK Imager alternative (Linux)
+sudo fdisk -l disk.img
+sudo mount -o loop,offset=$((512*2048)) disk.img /mnt/disk
+
+# Recover deleted files
+photorec disk.img
+foremost -i disk.img -o output/
+
+# Partition table
+mmls disk.img
+fls -r -o 2048 disk.img         # list files (The Sleuth Kit)</code></pre>
+			</section>
+
+			<section>
+				<h2>Memory Forensics (Volatility 3)</h2>
+				<pre><code>vol -f memory.dmp windows.info
+vol -f memory.dmp windows.pslist
+vol -f memory.dmp windows.cmdline
+vol -f memory.dmp windows.filescan | grep -i "flag"
+vol -f memory.dmp windows.dumpfiles --virtaddr 0xADDR</code></pre>
+			</section>
+
+			<section>
+				<h2>PCAP / Network</h2>
+				<pre><code># Wireshark filters
+http.request.method == "POST"
+tcp.stream eq 0
+frame contains "flag"
+ip.addr == 10.0.0.1
+
+# tshark
+tshark -r capture.pcap -Y "http" -T fields -e http.file_data
+tshark -r capture.pcap --export-objects http,./output/
+
+# Follow stream (tcpflow)
+tcpflow -r capture.pcap -C
+scapy:  rdpcap("capture.pcap")</code></pre>
+			</section>
+
+			<section>
+				<h2>Steganography</h2>
+				<pre><code># Image
+steghide extract -sf image.jpg
+steghide extract -sf image.jpg -p ""
+zsteg image.png                 # LSB analysis
+stegsolve                       # GUI color plane viewer
+
+# Audio
+sonic-visualiser                # spectrogram
+audacity → View → Spectrogram
+
+# zip / embedded
+binwalk -e file.png
+foremost -i file.png</code></pre>
+			</section>
+
+			<section>
+				<h2>Useful Tools</h2>
+				<div class="tools">
+					<span>Autopsy</span><span>FTK Imager</span><span>Volatility 3</span>
+					<span>Wireshark</span><span>tshark</span><span>binwalk</span>
+					<span>foremost</span><span>steghide</span><span>zsteg</span>
+					<span>exiftool</span><span>The Sleuth Kit</span><span>Cyberchef</span>
+				</div>
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.breadcrumb {
+		font-size: 0.8em;
+		color: var(--text-muted);
+		margin-bottom: 1.5em;
+	}
+	.breadcrumb a { color: var(--accent); }
+
+	h1 { font-size: 1.5em; margin-bottom: 1.25em; }
+	h2 { font-size: 0.95em; font-weight: 600; margin: 1.75em 0 0.6em; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+
+	section { margin-bottom: 0.5em; }
+
+	pre {
+		background: var(--bg-secondary);
+		border: 1px solid var(--border);
+		border-radius: 6px;
+		padding: 1em 1.2em;
+		overflow-x: auto;
+		font-size: 0.82em;
+		line-height: 1.6;
+	}
+
+	code { font-family: 'Fira Code', 'Consolas', monospace; }
+
+	.tools {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4em;
+		margin-top: 0.4em;
+	}
+
+	.tools span {
+		font-size: 0.78em;
+		padding: 3px 10px;
+		border-radius: 12px;
+		background: var(--bg-secondary);
+		border: 1px solid var(--border);
+		color: var(--text-muted);
+	}
+</style>
