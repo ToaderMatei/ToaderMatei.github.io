@@ -3,6 +3,21 @@ import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import { SITE_TITLE } from '../consts';
+
+const events = [
+	{ name: 'DefCamp CTF 2024 Quals', place: 68, pts: '722', rating: '7.513' },
+	{ name: 'DefCamp CTF 2025 Quals', place: 118, pts: '357', rating: '3.512' },
+	{ name: 'Midnight Flag CTF - EXECUTION', place: 315, pts: '300', rating: '1.715' },
+	{ name: 'Cyber Apocalypse CTF 2025', place: 2512, pts: '4425', rating: '1.872' },
+	{ name: 'jailCTF 2025', place: 321, pts: '100', rating: '0.238' },
+	{ name: 'TFC CTF 2024', place: 242, pts: '250', rating: '1.042' },
+];
+
+const members = [
+	{ handle: 'm68k', url: 'https://ctftime.org/user/189835' },
+	{ handle: 'Tal1banu', url: 'https://ctftime.org/user/189804' },
+	{ handle: 'snitel.nu', url: 'https://ctftime.org/user/229090' },
+];
 ---
 
 <!doctype html>
@@ -30,6 +45,50 @@ import { SITE_TITLE } from '../consts';
 					though I'll try anything in a CTF.
 				</p>
 
+				<!-- ── Team ── -->
+				<h2>Team</h2>
+				<p>
+					I play with <a href="https://ctftime.org/team/313771" target="_blank" class="team-link">NXLL</a>
+					— a small Romanian CTF team. We've been competing since 2024, with our best result being
+					<strong>68th place</strong> at DefCamp CTF 2024 Quals.
+				</p>
+
+				<div class="members">
+					{members.map((m) => (
+						<a href={m.url} target="_blank" class="member">
+							{m.handle}
+						</a>
+					))}
+				</div>
+
+				<h2>CTF Results</h2>
+				<div class="table-wrap">
+					<table>
+						<thead>
+							<tr>
+								<th>Event</th>
+								<th>Place</th>
+								<th>Points</th>
+								<th>Rating</th>
+							</tr>
+						</thead>
+						<tbody>
+							{events.map((e) => (
+								<tr>
+									<td>{e.name}</td>
+									<td class="num">#{e.place}</td>
+									<td class="num">{e.pts}</td>
+									<td class="num">{e.rating}</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</div>
+				<p class="ctftime-link">
+					<a href="https://ctftime.org/team/313771" target="_blank">View full profile on CTFtime →</a>
+				</p>
+
+				<!-- ── Contact ── -->
 				<h2>Contact</h2>
 				<ul>
 					<li>
@@ -39,6 +98,10 @@ import { SITE_TITLE } from '../consts';
 					<li>
 						<span class="label">Discord</span>
 						<span>m68k.</span>
+					</li>
+					<li>
+						<span class="label">CTFtime</span>
+						<a href="https://ctftime.org/user/189835" target="_blank">m68k</a>
 					</li>
 				</ul>
 			</div>
@@ -58,12 +121,12 @@ import { SITE_TITLE } from '../consts';
 		text-transform: uppercase;
 		letter-spacing: 0.08em;
 		color: var(--text-muted);
-		margin: 2em 0 1em;
+		margin: 2.25em 0 1em;
 		font-weight: 600;
 	}
 
 	.content {
-		max-width: 580px;
+		max-width: 620px;
 	}
 
 	.content p {
@@ -77,6 +140,96 @@ import { SITE_TITLE } from '../consts';
 		color: var(--text);
 	}
 
+	.team-link {
+		color: var(--accent);
+		font-weight: 600;
+	}
+
+	/* Members */
+	.members {
+		display: flex;
+		gap: 0.5em;
+		flex-wrap: wrap;
+		margin-bottom: 1.5em;
+	}
+
+	.member {
+		font-size: 0.85em;
+		padding: 4px 12px;
+		border-radius: 20px;
+		border: 1px solid var(--border);
+		background: var(--bg-secondary);
+		color: var(--text);
+		text-decoration: none;
+		transition: border-color 0.15s;
+	}
+
+	.member:hover {
+		border-color: var(--accent);
+		color: var(--accent);
+		text-decoration: none;
+	}
+
+	/* Table */
+	.table-wrap {
+		overflow-x: auto;
+		border: 1px solid var(--border);
+		border-radius: 8px;
+		margin-bottom: 0.75em;
+	}
+
+	table {
+		width: 100%;
+		border-collapse: collapse;
+		font-size: 0.85em;
+	}
+
+	thead th {
+		padding: 0.6em 1em;
+		text-align: left;
+		font-size: 0.75em;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: var(--text-muted);
+		border-bottom: 1px solid var(--border);
+	}
+
+	tbody tr {
+		border-bottom: 1px solid var(--border);
+	}
+
+	tbody tr:last-child {
+		border-bottom: none;
+	}
+
+	tbody tr:hover {
+		background: var(--bg-secondary);
+	}
+
+	td {
+		padding: 0.55em 1em;
+		color: var(--text-muted);
+	}
+
+	td:first-child {
+		color: var(--text);
+	}
+
+	.num {
+		font-variant-numeric: tabular-nums;
+		text-align: right;
+		white-space: nowrap;
+	}
+
+	.ctftime-link {
+		font-size: 0.82em !important;
+	}
+
+	.ctftime-link a {
+		color: var(--accent);
+	}
+
+	/* Contact list */
 	ul {
 		list-style: none;
 		padding: 0;
