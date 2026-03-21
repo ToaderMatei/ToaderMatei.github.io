@@ -81,15 +81,13 @@ const postsData = allPosts.map((p) => ({
 		</main>
 		<Footer />
 
-		<!-- Posts data passed to client -->
-		<script type="application/json" id="posts-data" set:html={JSON.stringify(postsData)}></script>
 	</body>
 </html>
 
-<script>
+<script define:vars={{ postsData }}>
 const PAGE_SIZE = 15;
 
-const CTF_LABEL: Record<string, string> = {
+const CTF_LABEL = {
 	'itec':         'ITEC 2025 CTF',
 	'chronos':      'Chronos Security CTF 2025',
 	'learn-it':     'Learn-it CTF',
@@ -100,28 +98,19 @@ const CTF_LABEL: Record<string, string> = {
 
 const CTF_ORDER = ['itec', 'chronos', 'learn-it', 'cyberedu', 'uscybergames', 'overthewire', '__other__'];
 
-interface PostData {
-	id: string;
-	title: string;
-	tags: string[];
-	date: string;
-}
-
-const posts: PostData[] = JSON.parse(
-	document.getElementById('posts-data')!.textContent!
-);
+const posts = postsData;
 
 let currentPage = 0;
 const pageCount = Math.ceil(posts.length / PAGE_SIZE);
 
-const container   = document.getElementById('posts-container')!;
-const pagination  = document.getElementById('pagination')!;
-const indicator   = document.getElementById('page-indicator')!;
+const container   = document.getElementById('posts-container');
+const pagination  = document.getElementById('pagination');
+const indicator   = document.getElementById('page-indicator');
 
 /* ── Helpers ── */
 
-function groupPosts(pagePosts: PostData[]): Array<{ key: string; label: string; posts: PostData[] }> {
-	const map: Record<string, PostData[]> = {};
+function groupPosts(pagePosts) {
+	const map = {};
 	for (const post of pagePosts) {
 		const key = CTF_ORDER.find((k) => post.tags.includes(k)) ?? '__other__';
 		if (!map[key]) map[key] = [];
@@ -136,7 +125,7 @@ function groupPosts(pagePosts: PostData[]): Array<{ key: string; label: string; 
 		}));
 }
 
-function formatDate(iso: string): string {
+function formatDate(iso) {
 	return new Date(iso).toLocaleDateString('en-US', {
 		month: 'short', day: 'numeric', year: 'numeric',
 	});
@@ -144,7 +133,7 @@ function formatDate(iso: string): string {
 
 /* ── Render ── */
 
-function buildHTML(page: number): string {
+function buildHTML(page) {
 	const slice  = posts.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 	const groups = groupPosts(slice);
 
@@ -193,7 +182,7 @@ function renderIndicator() {
 	indicator.textContent = `Page ${currentPage + 1} of ${pageCount}`;
 }
 
-async function goToPage(page: number) {
+async function goToPage(page) {
 	/* fade out */
 	container.classList.add('fade-out');
 	await new Promise((r) => setTimeout(r, 180));
@@ -210,7 +199,7 @@ async function goToPage(page: number) {
 	container.classList.remove('fade-in');
 
 	/* scroll write-ups section into comfortable view */
-	document.getElementById('writeups-section')!
+	document.getElementById('writeups-section')
 		.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
