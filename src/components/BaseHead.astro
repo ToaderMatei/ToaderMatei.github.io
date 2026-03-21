@@ -35,6 +35,22 @@ const { title, description } = Astro.props;
 <meta name="title" content={title} />
 <meta name="description" content={description} />
 
+<!-- Scroll-reveal observer -->
+<script is:inline>
+	document.addEventListener('DOMContentLoaded', () => {
+		const obs = new IntersectionObserver((entries) => {
+			entries.forEach(e => {
+				if (e.isIntersecting) {
+					e.target.classList.add('revealed');
+					obs.unobserve(e.target);
+				}
+			});
+		}, { threshold: 0.08 });
+
+		document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+	});
+</script>
+
 <!-- Open Graph -->
 <meta property="og:type" content="website" />
 <meta property="og:url" content={Astro.url} />

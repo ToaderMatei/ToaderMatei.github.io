@@ -39,6 +39,18 @@ import { SITE_TITLE } from '../consts';
 </header>
 
 <script>
+	/* ── Scroll blur ── */
+	const header = document.querySelector('header');
+	const onScroll = () => {
+		if (window.scrollY > 10) {
+			header?.classList.add('scrolled');
+		} else {
+			header?.classList.remove('scrolled');
+		}
+	};
+	window.addEventListener('scroll', onScroll, { passive: true });
+	onScroll();
+
 	const toggle = document.getElementById('theme-toggle');
 	const iconSun = document.getElementById('icon-sun');
 	const iconMoon = document.getElementById('icon-moon');
@@ -75,6 +87,15 @@ import { SITE_TITLE } from '../consts';
 		position: sticky;
 		top: 0;
 		z-index: 100;
+		transition: background-color 0.25s, backdrop-filter 0.25s, box-shadow 0.25s;
+		animation: fadeIn 0.3s ease both;
+	}
+
+	header.scrolled {
+		background-color: color-mix(in srgb, var(--bg) 80%, transparent);
+		backdrop-filter: blur(12px);
+		-webkit-backdrop-filter: blur(12px);
+		box-shadow: 0 1px 0 var(--border);
 	}
 
 	nav {
@@ -94,8 +115,13 @@ import { SITE_TITLE } from '../consts';
 		flex-shrink: 0;
 	}
 
+	.logo-btn {
+		transition: opacity 0.2s, transform 0.2s;
+	}
+
 	.logo-btn:hover {
 		opacity: 0.85;
+		transform: scale(1.04);
 	}
 
 	.logo {
@@ -133,10 +159,12 @@ import { SITE_TITLE } from '../consts';
 		align-items: center;
 		padding: 4px;
 		border-radius: 4px;
+		transition: color 0.15s, transform 0.15s;
 	}
 
 	.social-links a:hover {
 		color: var(--text);
+		transform: translateY(-1px);
 		text-decoration: none;
 	}
 

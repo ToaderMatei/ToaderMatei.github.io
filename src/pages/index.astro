@@ -79,6 +79,7 @@ const posts = (await getCollection('blog'))
 		font-size: 1.75em;
 		margin-bottom: 0.6em;
 		font-weight: 700;
+		animation: fadeUp 0.45s 0.05s cubic-bezier(0.22, 1, 0.36, 1) both;
 	}
 
 	.intro p {
@@ -87,6 +88,7 @@ const posts = (await getCollection('blog'))
 		font-size: 0.95em;
 		max-width: 520px;
 		line-height: 1.8;
+		animation: fadeUp 0.45s 0.15s cubic-bezier(0.22, 1, 0.36, 1) both;
 	}
 
 	.links {
@@ -95,6 +97,7 @@ const posts = (await getCollection('blog'))
 		align-items: center;
 		font-size: 0.875em;
 		color: var(--text-muted);
+		animation: fadeUp 0.45s 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
 	}
 
 	.links a {
@@ -143,7 +146,17 @@ const posts = (await getCollection('blog'))
 		gap: 1em;
 		padding: 0.75em 0;
 		border-bottom: 1px solid var(--border);
+		animation: slideInLeft 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
 	}
+
+	li:nth-child(1) { animation-delay: 0.32s; }
+	li:nth-child(2) { animation-delay: 0.38s; }
+	li:nth-child(3) { animation-delay: 0.44s; }
+	li:nth-child(4) { animation-delay: 0.50s; }
+	li:nth-child(5) { animation-delay: 0.56s; }
+	li:nth-child(6) { animation-delay: 0.62s; }
+	li:nth-child(7) { animation-delay: 0.68s; }
+	li:nth-child(8) { animation-delay: 0.74s; }
 
 	li:last-child {
 		border-bottom: none;

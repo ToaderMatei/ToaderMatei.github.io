@@ -14,7 +14,18 @@
       "Bash(curl -L \"https://github.com/ToaderMatei/CyberLens/raw/master/docs/screenshots/01_dashboard_apache.png\" -o \"C:/Users/toade/Desktop/site/public/projects/cyberlens-dashboard.png\")",
       "Bash(grep -h \"^title:\\\\|^tags:\\\\|^ctf:\" C:/Users/toade/Desktop/site/src/content/blog/*.md)",
       "WebFetch(domain:ctftime.org)",
-      "Bash(curl -s -A \"Mozilla/5.0 \\(Windows NT 10.0; Win64; x64\\) AppleWebKit/537.36\" https://ctftime.org/team/313771)"
+      "Bash(curl -s -A \"Mozilla/5.0 \\(Windows NT 10.0; Win64; x64\\) AppleWebKit/537.36\" https://ctftime.org/team/313771)",
+      "Bash(powershell -Command \"New-Item -Path ''C:\\\\Users\\\\toade\\\\Desktop\\\\site\\\\src\\\\pages\\\\cheatsheets\\\\web.astro'' -ItemType File -Force | Out-Null; Write-Host ''created''\")",
+      "Bash(powershell -Command \"Get-ChildItem ''C:\\\\Users\\\\toade\\\\Desktop\\\\site\\\\src\\\\pages\\\\cheatsheets\\\\'' | Select-Object Name, Attributes, IsReadOnly\")",
+      "Bash(powershell -Command \":*)",
+      "Bash(powershell -Command \"echo ''test'' | Out-File -FilePath ''C:\\\\Users\\\\toade\\\\Desktop\\\\site\\\\src\\\\pages\\\\cheatsheets\\\\test123.txt'' -Encoding utf8; if \\(Test-Path ''C:\\\\Users\\\\toade\\\\Desktop\\\\site\\\\src\\\\pages\\\\cheatsheets\\\\test123.txt''\\) { Remove-Item ''C:\\\\Users\\\\toade\\\\Desktop\\\\site\\\\src\\\\pages\\\\cheatsheets\\\\test123.txt''; Write-Host ''OK'' } else { Write-Host ''FAIL'' }\")",
+      "Bash(powershell -Command \"echo ''test'' | Out-File -FilePath ''C:\\\\Users\\\\toade\\\\Desktop\\\\site\\\\src\\\\pages\\\\cheatsheets\\\\web.astro'' -Encoding utf8; Write-Host ''OK''\")",
+      "Bash(powershell -Command \"echo ''test'' | Out-File ''C:\\\\Users\\\\toade\\\\Desktop\\\\site\\\\src\\\\pages\\\\cheatsheets\\\\webex.astro'' -Encoding utf8; if\\(Test-Path ''C:\\\\Users\\\\toade\\\\Desktop\\\\site\\\\src\\\\pages\\\\cheatsheets\\\\webex.astro''\\){Remove-Item ''C:\\\\Users\\\\toade\\\\Desktop\\\\site\\\\src\\\\pages\\\\cheatsheets\\\\webex.astro''; Write-Host ''webex OK''}\")",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(where npm:*)",
+      "Bash(where node:*)",
+      "Bash(node_modules.binastro build:*)",
+      "Bash(npx astro:*)"
     ]
   }
 }

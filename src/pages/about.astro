@@ -31,7 +31,7 @@ const members = [
 			<div class="content">
 
 				<!-- ── m68k callout ── -->
-				<div class="m68k-callout">
+				<div class="m68k-callout reveal">
 					<div class="m68k-callout-label">m68k</div>
 					<p>
 						The <strong>Motorola 68000</strong> is a 16/32-bit CISC processor released by Motorola in 1979.
@@ -67,14 +67,14 @@ const members = [
 				</p>
 
 				<!-- ── Team ── -->
-				<h2>Team</h2>
+				<h2 class="reveal">Team</h2>
 				<p>
 					I play with <a href="https://ctftime.org/team/313771" target="_blank" class="team-link">NXLL</a>
 					— a small Romanian CTF team. We've been competing since 2024, with our best result being
 					<strong>68th place</strong> at DefCamp CTF 2024 Quals.
 				</p>
 
-				<div class="members">
+				<div class="members reveal">
 					{members.map((m) => (
 						<a href={m.url} target="_blank" class="member">
 							{m.handle}
@@ -82,8 +82,8 @@ const members = [
 					))}
 				</div>
 
-				<h2>CTF Results</h2>
-				<div class="table-wrap">
+				<h2 class="reveal">CTF Results</h2>
+				<div class="table-wrap reveal">
 					<table>
 						<thead>
 							<tr>
@@ -110,8 +110,8 @@ const members = [
 				</p>
 
 				<!-- ── Contact ── -->
-				<h2>Contact</h2>
-				<ul>
+				<h2 class="reveal">Contact</h2>
+				<ul class="reveal">
 					<li>
 						<span class="label">GitHub</span>
 						<a href="https://github.com/ToaderMatei" target="_blank">ToaderMatei</a>
