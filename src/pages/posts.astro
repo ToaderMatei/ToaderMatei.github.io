@@ -145,21 +145,24 @@ function buildHTML(page) {
 
 	return groups.map(({ label, posts: gPosts }) => `
 		<div class="ctf-group">
-			<div class="ctf-name">
-				<span class="ctf-label">${label}</span>
-				<span class="count">${gPosts.length}</span>
+			<div class="ctf-group-header">
+				<span class="ctf-group-label">${label}</span>
+				<span class="ctf-group-count">${gPosts.length}</span>
+				<div class="ctf-group-line"></div>
 			</div>
-			<ul>
+			<ul class="post-list">
 				${gPosts.map((p) => `
-					<li>
+					<li class="post-item">
 						<a href="/blog/${p.id}/" class="post-link">
-							<span class="post-title">${p.title}</span>
-							<div class="post-meta">
-								<div class="tags">
-									${p.tags.map((t) => `<span class="tag">${t}</span>`).join('')}
+							<div class="post-left">
+								<span class="post-title">${p.title}</span>
+								<div class="post-tags">
+									${p.tags.map((t) => `<span class="post-tag">${t}</span>`).join('')}
 								</div>
-								<time datetime="${p.date}">${formatDate(p.date)}</time>
-								<span class="arrow">→</span>
+							</div>
+							<div class="post-right">
+								<time class="post-date" datetime="${p.date}">${formatDate(p.date)}</time>
+								<span class="post-arrow">→</span>
 							</div>
 						</a>
 					</li>
@@ -220,10 +223,7 @@ renderIndicator();
 		gap: 3.5em;
 	}
 
-	/* ── Section headers ── */
-	.section-header {
-		margin-bottom: 1.25em;
-	}
+	.section-header { margin-bottom: 1.25em; }
 
 	h1 {
 		font-size: 1.3em;
@@ -237,7 +237,6 @@ renderIndicator();
 		margin: 0;
 	}
 
-	/* ── Writeups header ── */
 	.writeups-title-row {
 		display: flex;
 		align-items: center;
@@ -250,163 +249,220 @@ renderIndicator();
 		background: var(--bg-secondary);
 		border: 1px solid var(--border);
 		border-radius: 20px;
-		padding: 2px 9px;
+		padding: 2px 10px;
 		font-variant-numeric: tabular-nums;
 	}
 
+	/* ── Cheat sheets ── */
+	.cheatsheet-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+		gap: 0.65em;
+	}
+
+	.cs-card {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25em;
+		padding: 0.9em 1em;
+		border: 1px solid var(--border);
+		border-radius: 8px;
+		background: var(--bg-secondary);
+		text-decoration: none;
+		transition: border-color 0.13s, box-shadow 0.13s, transform 0.13s;
+	}
+
+	.cs-card:hover {
+		border-color: var(--accent);
+		box-shadow: 0 0 0 1px var(--accent);
+		transform: translateY(-2px);
+	}
+
+	.cs-icon { font-size: 1.25em; line-height: 1; margin-bottom: 0.2em; }
+	.cs-title { font-weight: 600; font-size: 0.88em; color: var(--text); }
+	.cs-desc  { font-size: 0.73em; color: var(--text-muted); line-height: 1.4; }
+
+	@media (max-width: 600px) {
+		.cheatsheet-grid { grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); }
+	}
+</style>
+
+<style is:global>
 	/* ── Fade animation ── */
 	#posts-container {
-		transition: opacity 0.16s ease, transform 0.16s ease;
+		transition: opacity 0.18s ease, transform 0.18s ease;
 	}
-
 	#posts-container.fade-out {
 		opacity: 0;
-		transform: translateY(8px);
+		transform: translateY(10px);
 	}
-
 	#posts-container.fade-in {
 		opacity: 0;
-		transform: translateY(-8px);
-		animation: fadeIn 0.16s ease forwards;
+		transform: translateY(-10px);
+		animation: wu-fadeIn 0.18s ease forwards;
 	}
-
-	@keyframes fadeIn {
+	@keyframes wu-fadeIn {
 		to { opacity: 1; transform: translateY(0); }
 	}
 
 	/* ── CTF groups ── */
 	.ctf-group {
-		margin-bottom: 2em;
+		margin-bottom: 2.25em;
 	}
 
-	.ctf-name {
+	.ctf-group-header {
 		display: flex;
 		align-items: center;
-		gap: 0.6em;
-		padding-bottom: 0.5em;
-		margin-bottom: 0.15em;
-		border-bottom: 1px solid var(--border);
+		gap: 0.75em;
+		margin-bottom: 0.6em;
 	}
 
-	.ctf-label {
-		font-size: 0.72em;
+	.ctf-group-line {
+		flex: 1;
+		height: 1px;
+		background: var(--border);
+	}
+
+	.ctf-group-label {
+		font-size: 0.68em;
 		font-weight: 700;
 		text-transform: uppercase;
-		letter-spacing: 0.1em;
+		letter-spacing: 0.12em;
 		color: var(--text-muted);
+		white-space: nowrap;
 	}
 
-	.count {
-		background: var(--bg-secondary);
-		border: 1px solid var(--border);
-		border-radius: 10px;
+	.ctf-group-count {
+		font-size: 0.68em;
 		padding: 1px 8px;
-		font-size: 0.72em;
-		color: var(--text-muted);
-		font-weight: 400;
-	}
-
-	ul {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-	}
-
-	li {
-		border-bottom: 1px solid var(--border);
-	}
-
-	li:last-child {
-		border-bottom: none;
-	}
-
-	/* ── Post rows ── */
-	.post-link {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: 0.6em 0.5em 0.6em 0;
-		gap: 1em;
-		text-decoration: none;
-		color: var(--text);
-		border-radius: 4px;
-		transition: background 0.12s ease, padding-left 0.12s ease;
-	}
-
-	.post-link:hover {
-		padding-left: 0.5em;
-		background: var(--bg-secondary);
-	}
-
-	.post-link:hover .post-title {
-		color: var(--accent);
-	}
-
-	.post-link:hover .arrow {
-		opacity: 1;
-		transform: translateX(3px);
-	}
-
-	.post-title {
-		font-size: 0.88em;
-		flex-shrink: 1;
-		min-width: 0;
-		transition: color 0.12s ease;
-	}
-
-	.post-meta {
-		display: flex;
-		align-items: center;
-		gap: 0.6em;
-		flex-shrink: 0;
-	}
-
-	.tags {
-		display: flex;
-		gap: 0.3em;
-	}
-
-	.tag {
-		font-size: 0.65em;
-		padding: 2px 7px;
-		border-radius: 10px;
+		border-radius: 20px;
 		background: var(--bg-secondary);
 		border: 1px solid var(--border);
 		color: var(--text-muted);
 		white-space: nowrap;
 	}
 
-	time {
+	/* ── Post list ── */
+	.post-list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0;
+	}
+
+	.post-item {
+		border-left: 2px solid transparent;
+		transition: border-color 0.13s;
+	}
+
+	.post-item:hover {
+		border-left-color: var(--accent);
+	}
+
+	.post-link {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0.65em 0.75em 0.65em 0.85em;
+		gap: 1em;
+		text-decoration: none;
+		color: var(--text);
+		border-bottom: 1px solid var(--border);
+		transition: background 0.13s;
+	}
+
+	.post-item:last-child .post-link {
+		border-bottom: none;
+	}
+
+	.post-item:hover .post-link {
+		background: var(--bg-secondary);
+	}
+
+	.post-item:hover .post-title {
+		color: var(--accent);
+	}
+
+	.post-left {
+		display: flex;
+		flex-direction: column;
+		gap: 0.3em;
+		flex: 1;
+		min-width: 0;
+	}
+
+	.post-title {
+		font-size: 0.9em;
+		font-weight: 500;
+		color: var(--text);
+		transition: color 0.13s;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.post-tags {
+		display: flex;
+		gap: 0.3em;
+		flex-wrap: wrap;
+	}
+
+	.post-tag {
+		font-size: 0.63em;
+		padding: 1px 7px;
+		border-radius: 20px;
+		background: transparent;
+		border: 1px solid var(--border);
+		color: var(--text-muted);
+		white-space: nowrap;
+	}
+
+	.post-right {
+		display: flex;
+		align-items: center;
+		gap: 0.75em;
+		flex-shrink: 0;
+	}
+
+	.post-date {
 		font-size: 0.75em;
 		color: var(--text-muted);
 		white-space: nowrap;
 		font-variant-numeric: tabular-nums;
 	}
 
-	.arrow {
-		font-size: 0.8em;
+	.post-arrow {
+		font-size: 0.75em;
 		color: var(--accent);
 		opacity: 0;
-		transition: opacity 0.12s ease, transform 0.12s ease;
+		transform: translateX(-4px);
+		transition: opacity 0.13s, transform 0.13s;
+	}
+
+	.post-item:hover .post-arrow {
+		opacity: 1;
+		transform: translateX(0);
 	}
 
 	/* ── Pagination ── */
 	.pagination {
 		display: flex;
-		gap: 0.35em;
-		margin-top: 1.25em;
+		gap: 0.3em;
+		margin-top: 1.5em;
 	}
 
 	.page-btn {
-		min-width: 2.1em;
-		height: 2.1em;
+		min-width: 2em;
+		height: 2em;
 		padding: 0 0.5em;
 		font-size: 0.8em;
 		font-family: inherit;
 		font-weight: 500;
 		background: var(--bg-secondary);
 		border: 1px solid var(--border);
-		border-radius: 6px;
+		border-radius: 5px;
 		color: var(--text-muted);
 		cursor: pointer;
 		transition: border-color 0.13s, color 0.13s, background 0.13s;
@@ -428,53 +484,8 @@ renderIndicator();
 		cursor: default;
 	}
 
-	/* ── Cheat sheets ── */
-	.cheatsheet-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-		gap: 0.65em;
-	}
-
-	.cs-card {
-		display: flex;
-		flex-direction: column;
-		gap: 0.25em;
-		padding: 0.9em 1em;
-		border: 1px solid var(--border);
-		border-radius: 8px;
-		background: var(--bg-secondary);
-		text-decoration: none;
-		transition: border-color 0.13s, box-shadow 0.13s, transform 0.13s;
-	}
-
-	.cs-card:hover {
-		border-color: var(--accent);
-		box-shadow: 0 0 0 1px var(--accent);
-		transform: translateY(-1px);
-	}
-
-	.cs-icon {
-		font-size: 1.2em;
-		line-height: 1;
-		margin-bottom: 0.15em;
-	}
-
-	.cs-title {
-		font-weight: 600;
-		font-size: 0.88em;
-		color: var(--text);
-	}
-
-	.cs-desc {
-		font-size: 0.73em;
-		color: var(--text-muted);
-		line-height: 1.4;
-	}
-
-	/* ── Responsive ── */
 	@media (max-width: 600px) {
-		.post-meta .tags { display: none; }
-		.arrow { display: none; }
-		.cheatsheet-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+		.post-tags { display: none; }
+		.post-arrow { display: none; }
 	}
 </style>
