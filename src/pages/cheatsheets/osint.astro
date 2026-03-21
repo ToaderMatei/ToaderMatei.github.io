@@ -1,0 +1,159 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import { SITE_TITLE } from '../../consts';
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`OSINT Cheat Sheet | ${SITE_TITLE}`} description="CTF OSINT quick reference." />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<div class="breadcrumb"><a href="/posts">Posts</a> / Cheat Sheets / OSINT</div>
+			<h1>OSINT Cheat Sheet</h1>
+
+			<section>
+				<h2>Username Enumeration</h2>
+				<pre><code># Sherlock — hunt usernames across social networks
+sherlock username
+
+# Maigret — deeper profile pivot
+maigret username
+
+# WhatsMyName
+python3 whatsmyname.py -u username</code></pre>
+			</section>
+
+			<section>
+				<h2>Email / Domain Recon</h2>
+				<pre><code># Find emails for a domain
+theHarvester -d example.com -b google,bing,linkedin
+
+# Reverse email lookup
+holehe email@example.com
+
+# WHOIS / DNS
+whois example.com
+dig example.com ANY
+dnsx -l domains.txt -a -cname -mx -ns
+
+# Certificate transparency
+curl "https://crt.sh/?q=%.example.com&output=json" | jq '.[].name_value'</code></pre>
+			</section>
+
+			<section>
+				<h2>Image & Metadata</h2>
+				<pre><code># Extract EXIF metadata
+exiftool image.jpg
+
+# GPS coords from EXIF
+exiftool -GPSLatitude -GPSLongitude image.jpg
+
+# Reverse image search
+# Google Images → upload / paste URL
+# TinEye: tineye.com
+# Yandex Images (best for faces)
+
+# Remove EXIF
+exiftool -all= image.jpg</code></pre>
+			</section>
+
+			<section>
+				<h2>Google Dorking</h2>
+				<pre><code>site:example.com filetype:pdf
+site:example.com inurl:admin
+intitle:"index of" "backup"
+intext:"flag{" site:pastebin.com
+"@example.com" filetype:xls
+cache:example.com</code></pre>
+			</section>
+
+			<section>
+				<h2>Social Media & People</h2>
+				<pre><code># Twitter / X advanced search
+from:user since:2024-01-01 until:2024-12-31 "keyword"
+
+# LinkedIn recon (no login)
+site:linkedin.com/in "company name" "job title"
+
+# Archive / Wayback Machine
+curl "http://archive.org/wayback/available?url=example.com"
+# or: web.archive.org/web/*/example.com/*
+
+# Pastebin / leaks
+pwndb (onion) / haveibeenpwned.com
+grep.app — search public GitHub code</code></pre>
+			</section>
+
+			<section>
+				<h2>Geolocation</h2>
+				<pre><code># Tools
+# GeoGuessr clues: sun angle, vegetation, road signs, road markings
+# SunCalc.org — sun position by date/time/location
+# Overpass Turbo — query OpenStreetMap data
+# Google Street View + Maps
+
+# Tips
+# Look for: license plates, language on signs, electrical outlets,
+#           flora, architecture style, phone/power line styles</code></pre>
+			</section>
+
+			<section>
+				<h2>Useful Tools</h2>
+				<div class="tools">
+					<span>Sherlock</span><span>Maigret</span><span>theHarvester</span>
+					<span>Holehe</span><span>ExifTool</span><span>crt.sh</span>
+					<span>Maltego</span><span>SpiderFoot</span><span>Recon-ng</span>
+					<span>Wayback Machine</span><span>GeoGuessr</span><span>SunCalc</span>
+				</div>
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.breadcrumb {
+		font-size: 0.8em;
+		color: var(--text-muted);
+		margin-bottom: 1.5em;
+	}
+	.breadcrumb a { color: var(--accent); }
+
+	h1 { font-size: 1.5em; margin-bottom: 1.25em; }
+	h2 { font-size: 0.95em; font-weight: 600; margin: 1.75em 0 0.6em; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+
+	section { margin-bottom: 0.5em; }
+
+	pre {
+		background: var(--bg-secondary);
+		border: 1px solid var(--border);
+		border-radius: 6px;
+		padding: 1em 1.2em;
+		overflow-x: auto;
+		font-size: 0.82em;
+		line-height: 1.6;
+	}
+
+	code { font-family: 'Fira Code', 'Consolas', monospace; }
+
+	.tools {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4em;
+		margin-top: 0.4em;
+	}
+
+	.tools span {
+		font-size: 0.78em;
+		padding: 3px 10px;
+		border-radius: 12px;
+		background: var(--bg-secondary);
+		border: 1px solid var(--border);
+		color: var(--text-muted);
+	}
+</style>

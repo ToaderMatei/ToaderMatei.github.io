@@ -1,0 +1,179 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import { SITE_TITLE } from '../../consts';
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`Misc / Stego Cheat Sheet | ${SITE_TITLE}`} description="CTF misc and steganography quick reference." />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<div class="breadcrumb"><a href="/posts">Posts</a> / Cheat Sheets / Misc & Stego</div>
+			<h1>Misc / Stego Cheat Sheet</h1>
+
+			<section>
+				<h2>Image Steganography</h2>
+				<pre><code># steghide — embed/extract (JPEG, BMP)
+steghide extract -sf image.jpg
+steghide extract -sf image.jpg -p ""
+steghide extract -sf image.jpg -p password
+
+# zsteg — PNG/BMP LSB analysis
+zsteg image.png
+zsteg -a image.png              # try all methods
+
+# stegsolve (GUI) — color plane viewer, bit planes, stereograms
+java -jar stegsolve.jar
+
+# LSB manual check
+python3 -c "
+from PIL import Image
+img = Image.open('image.png')
+pixels = list(img.getdata())
+bits = ''.join(str(p[0] & 1) for p in pixels[:64])
+print(bits)
+"</code></pre>
+			</section>
+
+			<section>
+				<h2>Audio Steganography</h2>
+				<pre><code"># Spectrogram — look for hidden images
+# Audacity: View > Show Spectrogram
+# Sonic Visualiser + Color 3D plugin
+# Spectrum view online: academo.org/demos/spectrum-analyzer
+
+# DTMF tones → digits
+multimon-ng -t wav -a DTMF file.wav
+
+# MP3 / WAV metadata
+exiftool audio.mp3
+id3v2 -l audio.mp3
+
+# Hide in WAV LSB
+mp3stego-decode -X -P password file.mp3 out.txt</code></pre>
+			</section>
+
+			<section>
+				<h2>QR Codes & Barcodes</h2>
+				<pre><code># Decode QR
+zbarimg image.png
+python3 -c "import cv2; d=cv2.QRCodeDetector(); print(d.detectAndDecode(cv2.imread('qr.png'))[0])"
+
+# Fix/reconstruct damaged QR
+# QRazyBox (online) — manual pixel editor
+# QR error correction up to 30% (level H)
+
+# Barcode types: Code128, Code39, EAN, DataMatrix, Aztec
+# Online decoder: zxing.org/w/decode.jspx</code></pre>
+			</section>
+
+			<section>
+				<h2>Esoteric Languages</h2>
+				<pre><code># Brainfuck
+# Online interpreter: copy.sh/brainfuck
++++++ +++++ [->++ ...
+
+# Ook!  — translate Ook to BF then run
+# Malbolge — very hard, usually prewritten
+
+# Piet — pixel-based language, use npiet interpreter
+npiet image.png
+
+# Whitespace — tabs/spaces/newlines only
+# whitespace-interpreter on GitHub
+
+# Base variants
+base64 -d <<< "SGVsbG8="
+base85 / base32 / base58 — use CyberChef</code></pre>
+			</section>
+
+			<section>
+				<h2>File Tricks</h2>
+				<pre><code"># Check magic bytes / true type
+file mystery.bin
+xxd mystery.bin | head -4
+
+# Common magic bytes
+# PNG:  89 50 4E 47
+# JPG:  FF D8 FF
+# PDF:  25 50 44 46
+# ZIP:  50 4B 03 04
+# GIF:  47 49 46 38
+
+# Fix/repair corrupt file header with hex editor (e.g. hexedit, 010 Editor)
+
+# Polyglot files — valid as multiple formats simultaneously
+# e.g. JPEG + ZIP: unzip image.jpg</code></pre>
+			</section>
+
+			<section>
+				<h2>CyberChef Recipes</h2>
+				<pre><code># Magic operation — auto-detects encoding/encryption
+# Common recipe chains:
+From_Base64 → Gunzip → From_Hex
+XOR({key}) → From_Base64
+ROT13 → Reverse → From_Base64
+
+# gchq.github.io/CyberChef</code></pre>
+			</section>
+
+			<section>
+				<h2>Useful Tools</h2>
+				<div class="tools">
+					<span>steghide</span><span>zsteg</span><span>stegsolve</span>
+					<span>Sonic Visualiser</span><span>Audacity</span><span>zbarimg</span>
+					<span>CyberChef</span><span>exiftool</span><span>binwalk</span>
+					<span>multimon-ng</span><span>010 Editor</span><span>QRazyBox</span>
+				</div>
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.breadcrumb {
+		font-size: 0.8em;
+		color: var(--text-muted);
+		margin-bottom: 1.5em;
+	}
+	.breadcrumb a { color: var(--accent); }
+
+	h1 { font-size: 1.5em; margin-bottom: 1.25em; }
+	h2 { font-size: 0.95em; font-weight: 600; margin: 1.75em 0 0.6em; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+
+	section { margin-bottom: 0.5em; }
+
+	pre {
+		background: var(--bg-secondary);
+		border: 1px solid var(--border);
+		border-radius: 6px;
+		padding: 1em 1.2em;
+		overflow-x: auto;
+		font-size: 0.82em;
+		line-height: 1.6;
+	}
+
+	code { font-family: 'Fira Code', 'Consolas', monospace; }
+
+	.tools {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4em;
+		margin-top: 0.4em;
+	}
+
+	.tools span {
+		font-size: 0.78em;
+		padding: 3px 10px;
+		border-radius: 12px;
+		background: var(--bg-secondary);
+		border: 1px solid var(--border);
+		color: var(--text-muted);
+	}
+</style>

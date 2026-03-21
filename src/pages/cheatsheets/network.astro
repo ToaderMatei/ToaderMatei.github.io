@@ -1,0 +1,161 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import { SITE_TITLE } from '../../consts';
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`Network Cheat Sheet | ${SITE_TITLE}`} description="CTF network analysis quick reference." />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<div class="breadcrumb"><a href="/posts">Posts</a> / Cheat Sheets / Network</div>
+			<h1>Network Cheat Sheet</h1>
+
+			<section>
+				<h2>Wireshark Filters</h2>
+				<pre><code># Display filters
+http
+http.request.method == "POST"
+http.response.code == 200
+tcp.port == 4444
+udp.port == 53
+ip.addr == 192.168.1.1
+ip.src == 10.0.0.1 && ip.dst == 10.0.0.2
+tcp.stream eq 0
+frame contains "flag"
+dns.qry.name contains "example"
+ssl || tls</code></pre>
+			</section>
+
+			<section>
+				<h2>tshark (CLI Wireshark)</h2>
+				<pre><code># Basic read
+tshark -r capture.pcap
+
+# Filter + fields
+tshark -r capture.pcap -Y "http.request" -T fields \
+  -e ip.src -e http.host -e http.request.uri
+
+# Export HTTP objects
+tshark -r capture.pcap --export-objects http,./out/
+
+# Follow TCP stream
+tshark -r capture.pcap -q -z follow,tcp,ascii,0
+
+# Extract credentials
+tshark -r capture.pcap -Y "ftp" -T fields -e ftp.request.command -e ftp.request.arg</code></pre>
+			</section>
+
+			<section>
+				<h2>TCP / Protocol Tricks</h2>
+				<pre><code># Netcat basics
+nc -lvnp 4444                   # listen
+nc host 4444                    # connect
+nc -lvnp 4444 > file.bin        # receive file
+
+# Port scan
+nmap -sV -sC -p- target
+nmap -sU --top-ports 100 target # UDP
+
+# Banner grabbing
+nc target 80
+HEAD / HTTP/1.0
+
+# Covert channels — check ICMP data field, DNS TXT, HTTP headers</code></pre>
+			</section>
+
+			<section>
+				<h2>Scapy (Python)</h2>
+				<pre><code">from scapy.all import *
+
+# Read pcap
+pkts = rdpcap("capture.pcap")
+
+# Filter by protocol
+tcp_pkts = [p for p in pkts if TCP in p]
+
+# Extract raw payload
+for p in pkts:
+    if Raw in p:
+        print(p[Raw].load)
+
+# Reconstruct stream bytes
+from scapy.sessions import TCPSession
+pkts = sniff(offline="capture.pcap", session=TCPSession)</code></pre>
+			</section>
+
+			<section>
+				<h2>Protocol Decoding</h2>
+				<pre><code># DNS exfiltration — look for unusually long subdomain labels
+# HTTP basic auth — base64 in Authorization header
+echo "dXNlcjpwYXNz" | base64 -d
+
+# FTP — plaintext, check PASS command
+# SMTP — base64 encoded auth, look for DATA section
+# Telnet — stream is plaintext, follow TCP stream
+
+# SSL/TLS with key log file
+# Wireshark: Edit > Preferences > TLS > (Pre)-Master-Secret log
+export SSLKEYLOGFILE=~/sslkeys.log</code></pre>
+			</section>
+
+			<section>
+				<h2>Useful Tools</h2>
+				<div class="tools">
+					<span>Wireshark</span><span>tshark</span><span>tcpdump</span>
+					<span>Scapy</span><span>nmap</span><span>netcat</span>
+					<span>tcpflow</span><span>NetworkMiner</span><span>Zeek</span>
+					<span>Brim</span><span>CyberChef</span><span>mitmproxy</span>
+				</div>
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.breadcrumb {
+		font-size: 0.8em;
+		color: var(--text-muted);
+		margin-bottom: 1.5em;
+	}
+	.breadcrumb a { color: var(--accent); }
+
+	h1 { font-size: 1.5em; margin-bottom: 1.25em; }
+	h2 { font-size: 0.95em; font-weight: 600; margin: 1.75em 0 0.6em; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+
+	section { margin-bottom: 0.5em; }
+
+	pre {
+		background: var(--bg-secondary);
+		border: 1px solid var(--border);
+		border-radius: 6px;
+		padding: 1em 1.2em;
+		overflow-x: auto;
+		font-size: 0.82em;
+		line-height: 1.6;
+	}
+
+	code { font-family: 'Fira Code', 'Consolas', monospace; }
+
+	.tools {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4em;
+		margin-top: 0.4em;
+	}
+
+	.tools span {
+		font-size: 0.78em;
+		padding: 3px 10px;
+		border-radius: 12px;
+		background: var(--bg-secondary);
+		border: 1px solid var(--border);
+		color: var(--text-muted);
+	}
+</style>

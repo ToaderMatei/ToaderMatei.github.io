@@ -21,15 +21,15 @@ const CTF_LABEL: Record<string, string> = {
 const CTF_ORDER = ['itec', 'chronos', 'learn-it', 'cyberedu', 'uscybergames', 'overthewire', '__other__'];
 
 const cheatSheets = [
-	{ title: 'Forensics',        href: '/cheatsheets/forensics',  desc: 'Disk, memory, pcap, steganography' },
-	{ title: 'Web',              href: '/cheatsheets/webapp',     desc: 'SQLi, XSS, SSRF, file inclusion, SSTI' },
-	{ title: 'Linux / CLI',      href: '/cheatsheets/linux',      desc: 'Bandit-style challenges, file tricks, privilege escalation basics' },
-	{ title: 'Crypto',           href: '/cheatsheets/crypto',     desc: 'Classical ciphers, RSA, hashing, encoding tricks' },
-	{ title: 'Reversing',        href: '/cheatsheets/reversing',  desc: 'Ghidra, GDB, objdump, ltrace, patching binaries' },
-	{ title: 'Pwn',              href: '/cheatsheets/pwn',        desc: 'Buffer overflows, ROP chains, pwntools, shellcode' },
-	{ title: 'OSINT',            href: '/cheatsheets/osint',      desc: 'Username lookup, image geolocation, metadata, dorking' },
-	{ title: 'Network',          href: '/cheatsheets/network',    desc: 'Wireshark filters, TCP/UDP analysis, protocol decoding' },
-	{ title: 'Misc / Stego',     href: '/cheatsheets/misc',       desc: 'Steghide, LSB, QR codes, audio spectrograms, esoteric langs' },
+	{ title: 'Forensics',    icon: '🔍', href: '/cheatsheets/forensics',  desc: 'Disk, memory, pcap, steganography' },
+	{ title: 'Web',          icon: '🌐', href: '/cheatsheets/webapp',     desc: 'SQLi, XSS, SSRF, file inclusion, SSTI' },
+	{ title: 'Linux / CLI',  icon: '🐧', href: '/cheatsheets/linux',      desc: 'Bandit-style challenges, file tricks, privesc' },
+	{ title: 'Crypto',       icon: '🔐', href: '/cheatsheets/crypto',     desc: 'Classical ciphers, RSA, hashing, encoding' },
+	{ title: 'Reversing',    icon: '⚙️',  href: '/cheatsheets/reversing',  desc: 'Ghidra, GDB, objdump, ltrace, patching' },
+	{ title: 'Pwn',          icon: '💥', href: '/cheatsheets/pwn',        desc: 'Buffer overflows, ROP chains, pwntools' },
+	{ title: 'OSINT',        icon: '🕵️',  href: '/cheatsheets/osint',      desc: 'Username lookup, geolocation, dorking' },
+	{ title: 'Network',      icon: '📡', href: '/cheatsheets/network',    desc: 'Wireshark, tshark, TCP/UDP, protocols' },
+	{ title: 'Misc / Stego', icon: '🎨', href: '/cheatsheets/misc',       desc: 'Steghide, LSB, QR codes, esoteric langs' },
 ];
 
 /* Serialise only the fields the client script needs */
@@ -52,11 +52,14 @@ const postsData = allPosts.map((p) => ({
 
 			<!-- ── Cheat Sheets ── -->
 			<section class="cheatsheets-section">
-				<h1>Cheat Sheets</h1>
-				<p class="section-desc">Quick references for common CTF categories.</p>
+				<div class="section-header">
+					<h1>Cheat Sheets</h1>
+					<p class="section-desc">Quick references for common CTF categories.</p>
+				</div>
 				<div class="cheatsheet-grid">
 					{cheatSheets.map((cs) => (
 						<a href={cs.href} class="cs-card">
+							<span class="cs-icon">{cs.icon}</span>
 							<span class="cs-title">{cs.title}</span>
 							<span class="cs-desc">{cs.desc}</span>
 						</a>
@@ -66,9 +69,12 @@ const postsData = allPosts.map((p) => ({
 
 			<!-- ── Write-ups ── -->
 			<section id="writeups-section">
-				<div class="writeups-header">
-					<h1>Write-ups</h1>
-					<span id="page-indicator" class="page-indicator"></span>
+				<div class="section-header writeups-header">
+					<div class="writeups-title-row">
+						<h1>Write-ups</h1>
+						<span id="page-indicator" class="page-indicator"></span>
+					</div>
+					<p class="section-desc">CTF competition write-ups, grouped by event.</p>
 				</div>
 
 				<!-- Posts rendered by JS -->
@@ -103,9 +109,9 @@ const posts = postsData;
 let currentPage = 0;
 const pageCount = Math.ceil(posts.length / PAGE_SIZE);
 
-const container   = document.getElementById('posts-container');
-const pagination  = document.getElementById('pagination');
-const indicator   = document.getElementById('page-indicator');
+const container  = document.getElementById('posts-container');
+const pagination = document.getElementById('pagination');
+const indicator  = document.getElementById('page-indicator');
 
 /* ── Helpers ── */
 
@@ -137,12 +143,12 @@ function buildHTML(page) {
 	const slice  = posts.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 	const groups = groupPosts(slice);
 
-	return groups.map(({ key, label, posts: gPosts }) => `
+	return groups.map(({ label, posts: gPosts }) => `
 		<div class="ctf-group">
-			<h2 class="ctf-name">
-				${label}
+			<div class="ctf-name">
+				<span class="ctf-label">${label}</span>
 				<span class="count">${gPosts.length}</span>
-			</h2>
+			</div>
 			<ul>
 				${gPosts.map((p) => `
 					<li>
@@ -153,6 +159,7 @@ function buildHTML(page) {
 									${p.tags.map((t) => `<span class="tag">${t}</span>`).join('')}
 								</div>
 								<time datetime="${p.date}">${formatDate(p.date)}</time>
+								<span class="arrow">→</span>
 							</div>
 						</a>
 					</li>
@@ -179,26 +186,23 @@ function renderPagination() {
 
 function renderIndicator() {
 	if (pageCount <= 1) { indicator.textContent = ''; return; }
-	indicator.textContent = `Page ${currentPage + 1} of ${pageCount}`;
+	indicator.textContent = `${currentPage + 1} / ${pageCount}`;
 }
 
 async function goToPage(page) {
-	/* fade out */
 	container.classList.add('fade-out');
-	await new Promise((r) => setTimeout(r, 180));
+	await new Promise((r) => setTimeout(r, 160));
 
 	currentPage = page;
 	container.innerHTML = buildHTML(page);
 	renderPagination();
 	renderIndicator();
 
-	/* fade in */
 	container.classList.remove('fade-out');
 	container.classList.add('fade-in');
-	await new Promise((r) => setTimeout(r, 180));
+	await new Promise((r) => setTimeout(r, 160));
 	container.classList.remove('fade-in');
 
-	/* scroll write-ups section into comfortable view */
 	document.getElementById('writeups-section')
 		.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -213,52 +217,61 @@ renderIndicator();
 	main {
 		display: flex;
 		flex-direction: column;
-		gap: 3em;
+		gap: 3.5em;
+	}
+
+	/* ── Section headers ── */
+	.section-header {
+		margin-bottom: 1.25em;
 	}
 
 	h1 {
-		font-size: 1.4em;
-		margin-bottom: 1em;
+		font-size: 1.3em;
+		font-weight: 700;
+		margin: 0 0 0.3em;
+	}
+
+	.section-desc {
+		font-size: 0.82em;
+		color: var(--text-muted);
+		margin: 0;
 	}
 
 	/* ── Writeups header ── */
-	.writeups-header {
+	.writeups-title-row {
 		display: flex;
-		align-items: baseline;
-		gap: 1em;
-		margin-bottom: 0;
-	}
-
-	.writeups-header h1 {
-		margin-bottom: 0;
+		align-items: center;
+		gap: 0.75em;
 	}
 
 	.page-indicator {
-		font-size: 0.75em;
+		font-size: 0.72em;
 		color: var(--text-muted);
+		background: var(--bg-secondary);
+		border: 1px solid var(--border);
+		border-radius: 20px;
+		padding: 2px 9px;
+		font-variant-numeric: tabular-nums;
 	}
 
 	/* ── Fade animation ── */
 	#posts-container {
-		transition: opacity 0.18s ease, transform 0.18s ease;
+		transition: opacity 0.16s ease, transform 0.16s ease;
 	}
 
 	#posts-container.fade-out {
 		opacity: 0;
-		transform: translateY(6px);
+		transform: translateY(8px);
 	}
 
 	#posts-container.fade-in {
 		opacity: 0;
-		transform: translateY(-6px);
-		animation: fadeIn 0.18s ease forwards;
+		transform: translateY(-8px);
+		animation: fadeIn 0.16s ease forwards;
 	}
 
 	@keyframes fadeIn {
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
+		to { opacity: 1; transform: translateY(0); }
 	}
 
 	/* ── CTF groups ── */
@@ -267,25 +280,28 @@ renderIndicator();
 	}
 
 	.ctf-name {
-		font-size: 0.8em;
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.08em;
-		color: var(--text-muted);
-		border-bottom: 1px solid var(--border);
-		padding-bottom: 0.4em;
-		margin-bottom: 0.4em;
 		display: flex;
 		align-items: center;
 		gap: 0.6em;
+		padding-bottom: 0.5em;
+		margin-bottom: 0.15em;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.ctf-label {
+		font-size: 0.72em;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		color: var(--text-muted);
 	}
 
 	.count {
 		background: var(--bg-secondary);
 		border: 1px solid var(--border);
 		border-radius: 10px;
-		padding: 1px 7px;
-		font-size: 0.85em;
+		padding: 1px 8px;
+		font-size: 0.72em;
 		color: var(--text-muted);
 		font-weight: 400;
 	}
@@ -304,30 +320,44 @@ renderIndicator();
 		border-bottom: none;
 	}
 
+	/* ── Post rows ── */
 	.post-link {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: 0.55em 0;
+		padding: 0.6em 0.5em 0.6em 0;
 		gap: 1em;
 		text-decoration: none;
 		color: var(--text);
+		border-radius: 4px;
+		transition: background 0.12s ease, padding-left 0.12s ease;
+	}
+
+	.post-link:hover {
+		padding-left: 0.5em;
+		background: var(--bg-secondary);
 	}
 
 	.post-link:hover .post-title {
 		color: var(--accent);
 	}
 
+	.post-link:hover .arrow {
+		opacity: 1;
+		transform: translateX(3px);
+	}
+
 	.post-title {
-		font-size: 0.9em;
+		font-size: 0.88em;
 		flex-shrink: 1;
 		min-width: 0;
+		transition: color 0.12s ease;
 	}
 
 	.post-meta {
 		display: flex;
 		align-items: center;
-		gap: 0.75em;
+		gap: 0.6em;
 		flex-shrink: 0;
 	}
 
@@ -337,7 +367,7 @@ renderIndicator();
 	}
 
 	.tag {
-		font-size: 0.68em;
+		font-size: 0.65em;
 		padding: 2px 7px;
 		border-radius: 10px;
 		background: var(--bg-secondary);
@@ -347,29 +377,42 @@ renderIndicator();
 	}
 
 	time {
-		font-size: 0.78em;
+		font-size: 0.75em;
 		color: var(--text-muted);
 		white-space: nowrap;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.arrow {
+		font-size: 0.8em;
+		color: var(--accent);
+		opacity: 0;
+		transition: opacity 0.12s ease, transform 0.12s ease;
 	}
 
 	/* ── Pagination ── */
 	.pagination {
 		display: flex;
-		gap: 0.4em;
-		margin-top: 1.5em;
+		gap: 0.35em;
+		margin-top: 1.25em;
 	}
 
 	.page-btn {
-		min-width: 2em;
-		padding: 0.3em 0.65em;
-		font-size: 0.82em;
+		min-width: 2.1em;
+		height: 2.1em;
+		padding: 0 0.5em;
+		font-size: 0.8em;
 		font-family: inherit;
+		font-weight: 500;
 		background: var(--bg-secondary);
 		border: 1px solid var(--border);
 		border-radius: 6px;
 		color: var(--text-muted);
 		cursor: pointer;
-		transition: border-color 0.15s, color 0.15s, background 0.15s;
+		transition: border-color 0.13s, color 0.13s, background 0.13s;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 
 	.page-btn:hover {
@@ -381,59 +424,57 @@ renderIndicator();
 		background: var(--accent);
 		border-color: var(--accent);
 		color: #fff;
-		font-weight: 600;
+		font-weight: 700;
 		cursor: default;
 	}
 
 	/* ── Cheat sheets ── */
-	.cheatsheets-section {
-		padding-top: 0.5em;
-	}
-
-	.section-desc {
-		color: var(--text-muted);
-		font-size: 0.875em;
-		margin-top: -0.5em;
-		margin-bottom: 1.25em;
-	}
-
 	.cheatsheet-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-		gap: 0.75em;
+		grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+		gap: 0.65em;
 	}
 
 	.cs-card {
 		display: flex;
 		flex-direction: column;
-		gap: 0.3em;
-		padding: 1em 1.1em;
+		gap: 0.25em;
+		padding: 0.9em 1em;
 		border: 1px solid var(--border);
 		border-radius: 8px;
 		background: var(--bg-secondary);
 		text-decoration: none;
-		transition: border-color 0.15s, box-shadow 0.15s;
+		transition: border-color 0.13s, box-shadow 0.13s, transform 0.13s;
 	}
 
 	.cs-card:hover {
 		border-color: var(--accent);
 		box-shadow: 0 0 0 1px var(--accent);
+		transform: translateY(-1px);
+	}
+
+	.cs-icon {
+		font-size: 1.2em;
+		line-height: 1;
+		margin-bottom: 0.15em;
 	}
 
 	.cs-title {
 		font-weight: 600;
-		font-size: 0.9em;
+		font-size: 0.88em;
 		color: var(--text);
 	}
 
 	.cs-desc {
-		font-size: 0.78em;
+		font-size: 0.73em;
 		color: var(--text-muted);
+		line-height: 1.4;
 	}
 
+	/* ── Responsive ── */
 	@media (max-width: 600px) {
-		.post-meta .tags {
-			display: none;
-		}
+		.post-meta .tags { display: none; }
+		.arrow { display: none; }
+		.cheatsheet-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
 	}
 </style>
