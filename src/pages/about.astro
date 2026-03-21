@@ -29,6 +29,28 @@ const members = [
 		<main>
 			<h1>About</h1>
 			<div class="content">
+
+				<!-- ── m68k callout ── -->
+				<div class="m68k-callout">
+					<div class="m68k-callout-label">m68k</div>
+					<p>
+						The <strong>Motorola 68000</strong> is a 16/32-bit CISC processor released by Motorola in 1979.
+						It powered the original Apple Macintosh, the Commodore Amiga, and the Atari ST.
+						After desktops moved on, it lived inside millions of cable modems and routers — unpatched,
+						forgotten, still online.
+					</p>
+					<p>
+						When the <strong>Mirai</strong> botnet source leaked in 2016, its cross-compiler
+						included an explicit <code>m68k</code> target. Those neglected routers became the
+						foot-soldiers of record-breaking DDoS attacks — the 620 Gbps hit on
+						<em>KrebsOnSecurity</em> and the Dyn attack that took down large parts of the internet
+						for a day. Later variants (Satori, Okiru, Masuta) all kept hunting the same hardware.
+					</p>
+					<p class="m68k-callout-footer">
+						Old, overlooked technology rarely disappears — it just accumulates attack surface.
+					</p>
+				</div>
+
 				<p>
 					Hey — I'm <strong>m68k</strong>, a student from Romania. I spend most of my free time
 					playing CTF competitions and reading about security topics that probably have
@@ -117,6 +139,64 @@ const members = [
 	h1 {
 		font-size: 1.5em;
 		margin-bottom: 1.5em;
+	}
+
+	/* ── m68k callout ── */
+	.m68k-callout {
+		position: relative;
+		border: 1px solid var(--accent);
+		border-radius: 8px;
+		padding: 1.4em 1.5em 1.2em;
+		margin-bottom: 2em;
+		background: color-mix(in srgb, var(--accent) 5%, transparent);
+	}
+
+	.m68k-callout-label {
+		position: absolute;
+		top: -0.65em;
+		left: 1em;
+		background: var(--bg);
+		padding: 0 0.5em;
+		font-size: 0.7em;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--accent);
+		font-family: 'Fira Code', 'Consolas', monospace;
+	}
+
+	.m68k-callout p {
+		color: var(--text-muted);
+		font-size: 0.88em;
+		line-height: 1.75;
+		margin-bottom: 0.8em;
+	}
+
+	.m68k-callout p:last-child {
+		margin-bottom: 0;
+	}
+
+	.m68k-callout strong {
+		color: var(--text);
+	}
+
+	.m68k-callout code {
+		font-family: 'Fira Code', 'Consolas', monospace;
+		font-size: 0.9em;
+		color: var(--accent);
+		background: color-mix(in srgb, var(--accent) 10%, transparent);
+		padding: 1px 5px;
+		border-radius: 3px;
+	}
+
+	.m68k-callout-footer {
+		font-size: 0.82em !important;
+		font-style: italic;
+		color: var(--text-muted);
+		opacity: 0.75;
+		border-top: 1px solid var(--border);
+		padding-top: 0.75em;
+		margin-top: 0.5em;
 	}
 
 	h2 {
