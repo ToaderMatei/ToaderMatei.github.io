@@ -119,7 +119,7 @@ function groupPosts(pagePosts) {
 	return CTF_ORDER
 		.filter((k) => map[k]?.length)
 		.map((k) => ({
-			key,
+			key: k,
 			label: k === '__other__' ? 'Other' : CTF_LABEL[k],
 			posts: map[k],
 		}));
