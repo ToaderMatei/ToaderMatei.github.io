@@ -1,0 +1,168 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import { SITE_TITLE } from '../../consts';
+
+const codeClassical = `\
+# Caesar brute-force
+python3 -c "s='CIPHER'; [print(i, ''.join(chr((ord(c)-65+i)%26+65) if c.isupper() else c) for c in s)) for i in range(26)]"
+
+# ROT13
+echo "CIPHER" | tr 'A-Za-z' 'N-ZA-Mn-za-m'
+
+# Vigenère (online: https://www.dcode.fr/vigenere-cipher)
+# Atbash
+python3 -c "s='CIPHER'; print(''.join(chr(90-(ord(c)-65)) if c.isupper() else c for c in s))"
+
+# Substitution — use quipqiup.com or dcode.fr`;
+
+const codeEncoding = `\
+# Base64
+echo "dGVzdA==" | base64 -d
+base64 file.bin
+
+# Hex
+echo "74657374" | xxd -r -p
+python3 -c "print(bytes.fromhex('74657374').decode())"
+
+# Binary string → text
+python3 -c "b='01110100 01100101 01110011 01110100'; print(''.join(chr(int(x,2)) for x in b.split()))"
+
+# URL encode / decode
+python3 -c "import urllib.parse; print(urllib.parse.unquote('%66%6c%61%67'))"
+
+# CyberChef — best for quick multi-step chains`;
+
+const codeHashing = `\
+# Identify hash
+hash-identifier <hash>
+hashid <hash>
+
+# Crack with hashcat
+hashcat -m 0   hash.txt wordlist.txt   # MD5
+hashcat -m 100 hash.txt wordlist.txt   # SHA1
+hashcat -m 1800 hash.txt wordlist.txt  # sha512crypt
+
+# John the Ripper
+john --wordlist=rockyou.txt hash.txt
+john --show hash.txt
+
+# Online: crackstation.net, hashes.com`;
+
+const codeRSA = `\
+# Factor n with small primes → FactorDB / RsaCtfTool
+python3 RsaCtfTool.py --publickey pub.pem --private
+
+# Small e (e=3), no padding → cube root attack
+python3 -c "
+from sympy import integer_nthroot
+c = <ciphertext_int>
+m, exact = integer_nthroot(c, 3)
+print(bytes.fromhex(hex(m)[2:]))"
+
+# Common modulus attack, Wiener, Hastad → use RsaCtfTool flags:
+# --attack wiener / --attack hastads / --attack commonmodulus
+
+# Decrypt with known p, q
+python3 -c "
+p,q,e,c = <p>,<q>,<e>,<c>
+n=p*q; phi=(p-1)*(q-1)
+d=pow(e,-1,phi); print(bytes.fromhex(hex(pow(c,d,n))[2:]))"`;
+
+const codeXOR = `\
+# Single-byte XOR brute-force
+python3 -c "
+ct = bytes.fromhex('<hex>')
+for k in range(256):
+    pt = bytes(b^k for b in ct)
+    if b'flag' in pt.lower(): print(k, pt)"
+
+# Multi-byte XOR — guess key length (IC / Kasiski), then single-byte per slot
+# xortool: xortool -x -l <keylen> file.bin
+
+# XOR two known plaintexts → key
+python3 -c "a=b'known'; b=b'cipher'; print(bytes(x^y for x,y in zip(a,b)))"`;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`Crypto Cheat Sheet | ${SITE_TITLE}`} description="CTF cryptography quick reference." />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<div class="breadcrumb"><a href="/posts">Posts</a> / Cheat Sheets / Crypto</div>
+			<h1>Crypto Cheat Sheet</h1>
+
+			<section>
+				<h2>Classical Ciphers</h2>
+				<pre><code set:text={codeClassical} /></pre>
+			</section>
+
+			<section>
+				<h2>Encoding / Decoding</h2>
+				<pre><code set:text={codeEncoding} /></pre>
+			</section>
+
+			<section>
+				<h2>Hash Cracking</h2>
+				<pre><code set:text={codeHashing} /></pre>
+			</section>
+
+			<section>
+				<h2>RSA Attacks</h2>
+				<pre><code set:text={codeRSA} /></pre>
+			</section>
+
+			<section>
+				<h2>XOR</h2>
+				<pre><code set:text={codeXOR} /></pre>
+			</section>
+
+			<section>
+				<h2>Useful Tools</h2>
+				<div class="tools">
+					<span>CyberChef</span><span>RsaCtfTool</span><span>hashcat</span>
+					<span>John the Ripper</span><span>xortool</span><span>dcode.fr</span>
+					<span>FactorDB</span><span>crackstation.net</span><span>SageMath</span>
+					<span>pycryptodome</span><span>sympy</span>
+				</div>
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.breadcrumb { font-size: 0.8em; color: var(--text-muted); margin-bottom: 1.5em; }
+	.breadcrumb a { color: var(--accent); }
+	h1 { font-size: 1.5em; margin-bottom: 1.25em; }
+	h2 { font-size: 0.95em; font-weight: 600; margin: 1.75em 0 0.6em; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+	section { margin-bottom: 0.5em; }
+	pre {
+		background: var(--bg-secondary);
+		border: 1px solid var(--border);
+		border-radius: 6px;
+		padding: 1em 1.2em;
+		overflow-x: auto;
+		font-size: 0.82em;
+		line-height: 1.6;
+	}
+	code { font-family: 'Fira Code', 'Consolas', monospace; }
+	.tools {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4em;
+		margin-top: 0.4em;
+	}
+	.tools span {
+		font-size: 0.78em;
+		padding: 3px 10px;
+		border-radius: 12px;
+		background: var(--bg-secondary);
+		border: 1px solid var(--border);
+		color: var(--text-muted);
+	}
+</style>

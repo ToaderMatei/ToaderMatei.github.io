@@ -35,6 +35,9 @@ const cheatSheets = [
 	{ title: 'Forensics', href: '/cheatsheets/forensics', desc: 'Disk, memory, pcap, steganography' },
 	{ title: 'Web', href: '/cheatsheets/webapp', desc: 'SQLi, XSS, SSRF, file inclusion, SSTI' },
 	{ title: 'Linux / CLI', href: '/cheatsheets/linux', desc: 'Bandit-style challenges, file tricks, privilege escalation basics' },
+	{ title: 'Crypto', href: '/cheatsheets/crypto', desc: 'Classical ciphers, RSA, hashing, encoding tricks' },
+	{ title: 'Reversing', href: '/cheatsheets/reversing', desc: 'Ghidra, GDB, objdump, ltrace, patching binaries' },
+	{ title: 'Pwn', href: '/cheatsheets/pwn', desc: 'Buffer overflows, ROP chains, pwntools, shellcode' },
 ];
 ---
 
@@ -46,6 +49,20 @@ const cheatSheets = [
 	<body>
 		<Header />
 		<main>
+
+			<!-- ── Cheat Sheets ── -->
+			<section class="cheatsheets-section">
+				<h1>Cheat Sheets</h1>
+				<p class="section-desc">Quick references for common CTF categories.</p>
+				<div class="cheatsheet-grid">
+					{cheatSheets.map((cs) => (
+						<a href={cs.href} class="cs-card">
+							<span class="cs-title">{cs.title}</span>
+							<span class="cs-desc">{cs.desc}</span>
+						</a>
+					))}
+				</div>
+			</section>
 
 			<!-- ── Write-ups ── -->
 			<section>
@@ -77,20 +94,6 @@ const cheatSheets = [
 						</ul>
 					</div>
 				))}
-			</section>
-
-			<!-- ── Cheat Sheets ── -->
-			<section class="cheatsheets-section">
-				<h1>Cheat Sheets</h1>
-				<p class="section-desc">Quick references for common CTF categories.</p>
-				<div class="cheatsheet-grid">
-					{cheatSheets.map((cs) => (
-						<a href={cs.href} class="cs-card">
-							<span class="cs-title">{cs.title}</span>
-							<span class="cs-desc">{cs.desc}</span>
-						</a>
-					))}
-				</div>
 			</section>
 
 		</main>

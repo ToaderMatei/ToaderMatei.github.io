@@ -1,0 +1,170 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import { SITE_TITLE } from '../../consts';
+
+const codeRecon = `\
+file binary
+checksec --file=binary          # NX, PIE, canary, RELRO
+strings binary | grep -i flag
+strings binary | grep -i pass
+rabin2 -I binary                # radare2 binary info
+readelf -a binary
+objdump -d binary | less`;
+
+const codeGhidra = `\
+# Launch: ghidraRun
+# Import binary → Auto-analyze
+# Functions window → find main / suspicious names
+# Search > For Strings → look for flag patterns
+# Right-click symbol → References → Find callers
+# Patch instruction: right-click → Patch Instruction
+# Export patched binary: File > Export Program → ELF`;
+
+const codeGDB = `\
+gdb ./binary
+(gdb) run
+(gdb) break main
+(gdb) info functions
+(gdb) disas main
+(gdb) x/s 0xADDR          # print string at address
+(gdb) x/20x $esp           # dump stack
+(gdb) set $eax = 1         # patch register
+(gdb) p (char*)0xADDR      # print string
+
+# GDB-peda / pwndbg (install for nicer output)
+pwndbg> checksec
+pwndbg> telescope $rsp 20`;
+
+const codeDynamic = `\
+# Trace library calls
+ltrace ./binary
+ltrace -e strcmp ./binary   # watch only strcmp
+
+# Trace syscalls
+strace ./binary
+strace -e read,write ./binary
+
+# strace + ltrace together
+strace -f -e trace=all ./binary 2>&1 | grep -i flag
+
+# Run with input
+echo "password" | ./binary
+./binary <<< "AAAA"`;
+
+const codePatch = `\
+# Change a byte with python
+python3 -c "
+data = bytearray(open('binary','rb').read())
+data[0x1234] = 0x90          # NOP at offset
+open('patched','wb').write(data)"
+chmod +x patched
+
+# Flip a conditional jump:
+#   je  (74) → jne (75)
+#   jne (75) → je  (74)
+# Use ghidra or: printf '\\x90\\x90' | dd of=bin bs=1 seek=OFFSET conv=notrunc
+
+# radare2 patch
+r2 -w binary
+[0x...]> wa nop              # write NOP
+[0x...]> wa jmp 0xADDR`;
+
+const codeAntiDebug = `\
+# ptrace anti-debug → patch check to always return 0
+# Timing checks → ignore with gdb "set follow-fork-mode child"
+# Packed binary (UPX)
+upx -d binary               # decompress
+file binary | grep UPX
+
+# Obfuscated strings → dynamic analysis with ltrace/strace
+# VM detection → run in bare metal or fix check`;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`Reversing Cheat Sheet | ${SITE_TITLE}`} description="CTF reverse engineering quick reference." />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<div class="breadcrumb"><a href="/posts">Posts</a> / Cheat Sheets / Reversing</div>
+			<h1>Reversing Cheat Sheet</h1>
+
+			<section>
+				<h2>Initial Recon</h2>
+				<pre><code set:text={codeRecon} /></pre>
+			</section>
+
+			<section>
+				<h2>Ghidra</h2>
+				<pre><code set:text={codeGhidra} /></pre>
+			</section>
+
+			<section>
+				<h2>GDB</h2>
+				<pre><code set:text={codeGDB} /></pre>
+			</section>
+
+			<section>
+				<h2>Dynamic Analysis (ltrace / strace)</h2>
+				<pre><code set:text={codeDynamic} /></pre>
+			</section>
+
+			<section>
+				<h2>Patching Binaries</h2>
+				<pre><code set:text={codePatch} /></pre>
+			</section>
+
+			<section>
+				<h2>Anti-Debug / Packing</h2>
+				<pre><code set:text={codeAntiDebug} /></pre>
+			</section>
+
+			<section>
+				<h2>Useful Tools</h2>
+				<div class="tools">
+					<span>Ghidra</span><span>IDA Free</span><span>GDB</span>
+					<span>pwndbg</span><span>peda</span><span>radare2</span>
+					<span>ltrace</span><span>strace</span><span>objdump</span>
+					<span>binwalk</span><span>UPX</span><span>Cutter</span>
+				</div>
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.breadcrumb { font-size: 0.8em; color: var(--text-muted); margin-bottom: 1.5em; }
+	.breadcrumb a { color: var(--accent); }
+	h1 { font-size: 1.5em; margin-bottom: 1.25em; }
+	h2 { font-size: 0.95em; font-weight: 600; margin: 1.75em 0 0.6em; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+	section { margin-bottom: 0.5em; }
+	pre {
+		background: var(--bg-secondary);
+		border: 1px solid var(--border);
+		border-radius: 6px;
+		padding: 1em 1.2em;
+		overflow-x: auto;
+		font-size: 0.82em;
+		line-height: 1.6;
+	}
+	code { font-family: 'Fira Code', 'Consolas', monospace; }
+	.tools {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4em;
+		margin-top: 0.4em;
+	}
+	.tools span {
+		font-size: 0.78em;
+		padding: 3px 10px;
+		border-radius: 12px;
+		background: var(--bg-secondary);
+		border: 1px solid var(--border);
+		color: var(--text-muted);
+	}
+</style>
