@@ -20,25 +20,25 @@ const CTF_LABEL: Record<string, string> = {
 
 const CTF_ORDER = ['itec', 'chronos', 'learn-it', 'cyberedu', 'uscybergames', 'overthewire', '__other__'];
 
-type Post = typeof allPosts[number];
-
-const grouped: Record<string, Post[]> = {};
-
-for (const post of allPosts) {
-	const tags: string[] = post.data.tags ?? [];
-	const key = Object.keys(CTF_LABEL).find((k) => tags.includes(k)) ?? '__other__';
-	if (!grouped[key]) grouped[key] = [];
-	grouped[key].push(post);
-}
-
 const cheatSheets = [
-	{ title: 'Forensics', href: '/cheatsheets/forensics', desc: 'Disk, memory, pcap, steganography' },
-	{ title: 'Web', href: '/cheatsheets/webapp', desc: 'SQLi, XSS, SSRF, file inclusion, SSTI' },
-	{ title: 'Linux / CLI', href: '/cheatsheets/linux', desc: 'Bandit-style challenges, file tricks, privilege escalation basics' },
-	{ title: 'Crypto', href: '/cheatsheets/crypto', desc: 'Classical ciphers, RSA, hashing, encoding tricks' },
-	{ title: 'Reversing', href: '/cheatsheets/reversing', desc: 'Ghidra, GDB, objdump, ltrace, patching binaries' },
-	{ title: 'Pwn', href: '/cheatsheets/pwn', desc: 'Buffer overflows, ROP chains, pwntools, shellcode' },
+	{ title: 'Forensics',        href: '/cheatsheets/forensics',  desc: 'Disk, memory, pcap, steganography' },
+	{ title: 'Web',              href: '/cheatsheets/webapp',     desc: 'SQLi, XSS, SSRF, file inclusion, SSTI' },
+	{ title: 'Linux / CLI',      href: '/cheatsheets/linux',      desc: 'Bandit-style challenges, file tricks, privilege escalation basics' },
+	{ title: 'Crypto',           href: '/cheatsheets/crypto',     desc: 'Classical ciphers, RSA, hashing, encoding tricks' },
+	{ title: 'Reversing',        href: '/cheatsheets/reversing',  desc: 'Ghidra, GDB, objdump, ltrace, patching binaries' },
+	{ title: 'Pwn',              href: '/cheatsheets/pwn',        desc: 'Buffer overflows, ROP chains, pwntools, shellcode' },
+	{ title: 'OSINT',            href: '/cheatsheets/osint',      desc: 'Username lookup, image geolocation, metadata, dorking' },
+	{ title: 'Network',          href: '/cheatsheets/network',    desc: 'Wireshark filters, TCP/UDP analysis, protocol decoding' },
+	{ title: 'Misc / Stego',     href: '/cheatsheets/misc',       desc: 'Steghide, LSB, QR codes, audio spectrograms, esoteric langs' },
 ];
+
+/* Serialise only the fields the client script needs */
+const postsData = allPosts.map((p) => ({
+	id:    p.id,
+	title: p.data.title,
+	tags:  p.data.tags ?? [],
+	date:  p.data.pubDate.toISOString(),
+}));
 ---
 
 <!doctype html>
@@ -65,41 +65,160 @@ const cheatSheets = [
 			</section>
 
 			<!-- ── Write-ups ── -->
-			<section>
-				<h1>Write-ups</h1>
-				{CTF_ORDER.filter((k) => grouped[k]?.length).map((key) => (
-					<div class="ctf-group">
-						<h2 class="ctf-name">
-							{key === '__other__' ? 'Other' : CTF_LABEL[key]}
-							<span class="count">{grouped[key].length}</span>
-						</h2>
-						<ul>
-							{grouped[key].map((post) => (
-								<li>
-									<a href={`/blog/${post.id}/`} class="post-link">
-										<span class="post-title">{post.data.title}</span>
-										<div class="post-meta">
-											<div class="tags">
-												{(post.data.tags ?? []).map((tag: string) => (
-													<span class="tag">{tag}</span>
-												))}
-											</div>
-											<time datetime={post.data.pubDate.toISOString()}>
-												{post.data.pubDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-											</time>
-										</div>
-									</a>
-								</li>
-							))}
-						</ul>
-					</div>
-				))}
+			<section id="writeups-section">
+				<div class="writeups-header">
+					<h1>Write-ups</h1>
+					<span id="page-indicator" class="page-indicator"></span>
+				</div>
+
+				<!-- Posts rendered by JS -->
+				<div id="posts-container"></div>
+
+				<!-- Pagination buttons -->
+				<div id="pagination" class="pagination"></div>
 			</section>
 
 		</main>
 		<Footer />
+
+		<!-- Posts data passed to client -->
+		<script type="application/json" id="posts-data" set:html={JSON.stringify(postsData)}></script>
 	</body>
 </html>
+
+<script>
+const PAGE_SIZE = 15;
+
+const CTF_LABEL: Record<string, string> = {
+	'itec':         'ITEC 2025 CTF',
+	'chronos':      'Chronos Security CTF 2025',
+	'learn-it':     'Learn-it CTF',
+	'cyberedu':     'CyberEdu / ROCSC',
+	'uscybergames': 'US Cyber Games',
+	'overthewire':  'OverTheWire',
+};
+
+const CTF_ORDER = ['itec', 'chronos', 'learn-it', 'cyberedu', 'uscybergames', 'overthewire', '__other__'];
+
+interface PostData {
+	id: string;
+	title: string;
+	tags: string[];
+	date: string;
+}
+
+const posts: PostData[] = JSON.parse(
+	document.getElementById('posts-data')!.textContent!
+);
+
+let currentPage = 0;
+const pageCount = Math.ceil(posts.length / PAGE_SIZE);
+
+const container   = document.getElementById('posts-container')!;
+const pagination  = document.getElementById('pagination')!;
+const indicator   = document.getElementById('page-indicator')!;
+
+/* ── Helpers ── */
+
+function groupPosts(pagePosts: PostData[]): Array<{ key: string; label: string; posts: PostData[] }> {
+	const map: Record<string, PostData[]> = {};
+	for (const post of pagePosts) {
+		const key = CTF_ORDER.find((k) => post.tags.includes(k)) ?? '__other__';
+		if (!map[key]) map[key] = [];
+		map[key].push(post);
+	}
+	return CTF_ORDER
+		.filter((k) => map[k]?.length)
+		.map((k) => ({
+			key,
+			label: k === '__other__' ? 'Other' : CTF_LABEL[k],
+			posts: map[k],
+		}));
+}
+
+function formatDate(iso: string): string {
+	return new Date(iso).toLocaleDateString('en-US', {
+		month: 'short', day: 'numeric', year: 'numeric',
+	});
+}
+
+/* ── Render ── */
+
+function buildHTML(page: number): string {
+	const slice  = posts.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+	const groups = groupPosts(slice);
+
+	return groups.map(({ key, label, posts: gPosts }) => `
+		<div class="ctf-group">
+			<h2 class="ctf-name">
+				${label}
+				<span class="count">${gPosts.length}</span>
+			</h2>
+			<ul>
+				${gPosts.map((p) => `
+					<li>
+						<a href="/blog/${p.id}/" class="post-link">
+							<span class="post-title">${p.title}</span>
+							<div class="post-meta">
+								<div class="tags">
+									${p.tags.map((t) => `<span class="tag">${t}</span>`).join('')}
+								</div>
+								<time datetime="${p.date}">${formatDate(p.date)}</time>
+							</div>
+						</a>
+					</li>
+				`).join('')}
+			</ul>
+		</div>
+	`).join('');
+}
+
+function renderPagination() {
+	pagination.innerHTML = '';
+	if (pageCount <= 1) return;
+
+	for (let i = 0; i < pageCount; i++) {
+		const btn = document.createElement('button');
+		btn.textContent = String(i + 1);
+		btn.className = 'page-btn' + (i === currentPage ? ' active' : '');
+		btn.addEventListener('click', () => {
+			if (i !== currentPage) goToPage(i);
+		});
+		pagination.appendChild(btn);
+	}
+}
+
+function renderIndicator() {
+	if (pageCount <= 1) { indicator.textContent = ''; return; }
+	indicator.textContent = `Page ${currentPage + 1} of ${pageCount}`;
+}
+
+async function goToPage(page: number) {
+	/* fade out */
+	container.classList.add('fade-out');
+	await new Promise((r) => setTimeout(r, 180));
+
+	currentPage = page;
+	container.innerHTML = buildHTML(page);
+	renderPagination();
+	renderIndicator();
+
+	/* fade in */
+	container.classList.remove('fade-out');
+	container.classList.add('fade-in');
+	await new Promise((r) => setTimeout(r, 180));
+	container.classList.remove('fade-in');
+
+	/* scroll write-ups section into comfortable view */
+	document.getElementById('writeups-section')!
+		.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ── Init ── */
+container.innerHTML = buildHTML(0);
+renderPagination();
+renderIndicator();
+</script>
 
 <style>
 	main {
@@ -111,6 +230,46 @@ const cheatSheets = [
 	h1 {
 		font-size: 1.4em;
 		margin-bottom: 1em;
+	}
+
+	/* ── Writeups header ── */
+	.writeups-header {
+		display: flex;
+		align-items: baseline;
+		gap: 1em;
+		margin-bottom: 0;
+	}
+
+	.writeups-header h1 {
+		margin-bottom: 0;
+	}
+
+	.page-indicator {
+		font-size: 0.75em;
+		color: var(--text-muted);
+	}
+
+	/* ── Fade animation ── */
+	#posts-container {
+		transition: opacity 0.18s ease, transform 0.18s ease;
+	}
+
+	#posts-container.fade-out {
+		opacity: 0;
+		transform: translateY(6px);
+	}
+
+	#posts-container.fade-in {
+		opacity: 0;
+		transform: translateY(-6px);
+		animation: fadeIn 0.18s ease forwards;
+	}
+
+	@keyframes fadeIn {
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
 	}
 
 	/* ── CTF groups ── */
@@ -168,7 +327,6 @@ const cheatSheets = [
 
 	.post-link:hover .post-title {
 		color: var(--accent);
-		text-decoration: none;
 	}
 
 	.post-title {
@@ -205,6 +363,39 @@ const cheatSheets = [
 		white-space: nowrap;
 	}
 
+	/* ── Pagination ── */
+	.pagination {
+		display: flex;
+		gap: 0.4em;
+		margin-top: 1.5em;
+	}
+
+	.page-btn {
+		min-width: 2em;
+		padding: 0.3em 0.65em;
+		font-size: 0.82em;
+		font-family: inherit;
+		background: var(--bg-secondary);
+		border: 1px solid var(--border);
+		border-radius: 6px;
+		color: var(--text-muted);
+		cursor: pointer;
+		transition: border-color 0.15s, color 0.15s, background 0.15s;
+	}
+
+	.page-btn:hover {
+		border-color: var(--accent);
+		color: var(--accent);
+	}
+
+	.page-btn.active {
+		background: var(--accent);
+		border-color: var(--accent);
+		color: #fff;
+		font-weight: 600;
+		cursor: default;
+	}
+
 	/* ── Cheat sheets ── */
 	.cheatsheets-section {
 		padding-top: 0.5em;
@@ -238,7 +429,6 @@ const cheatSheets = [
 	.cs-card:hover {
 		border-color: var(--accent);
 		box-shadow: 0 0 0 1px var(--accent);
-		text-decoration: none;
 	}
 
 	.cs-title {
